@@ -1,5 +1,6 @@
 import pygame
 import sys
+import time
 
 from player import Player
 from enemy import EnemyCircle
@@ -50,6 +51,9 @@ class Game:
         self.lbl_iter_num = None
         self.lbl_max_moves = None
 
+        # Clock
+        self.clock = pygame.time.Clock()
+
     def createScreen(self, w, h):
         pygame.init()
         self.sc = pygame.display.set_mode([w, h])
@@ -64,33 +68,41 @@ class Game:
         self.game_loop()
 
     def game_loop(self):
+        time.sleep(10)
 
-        self.init_positions()
-        self.pl.mov_num = 0
+        while not self.isWin:            
+            self.init_positions()
+            self.pl.mov_num = 0
 
-        while self.gameContinues:
+            while self.gameContinues:
 
-            self.sc.fill(Game.white)
-            self.check_input()
+                self.sc.fill(Game.white)
+                self.check_input()
 
-            self.learn.find_move()
+                self.learn.find_move()
 
-            #self.pl.get_keys()
-            #print(self.pl.speed, self.enemies[0].speed)
+                self.clock.tick(30)
 
-            self.updateMap()
+                self.updateMap()
 
-        self.endGame()
+            # Probably can wrap this in a print state/status method
+            print('Iteration: ', self.iter_num)
+            qsz = 0
+            for i in self.learn.q_value_table:
+                for j in self.learn.q_value_table[i]:
+                    qsz += len(self.learn.q_value_table[i][j].t)
+            print('Q-Table size: ', qsz)
+            self.endGame()
 
     #functions used while game
     def createEnv(self):
 
         self.sc.fill(Game.white)
 
-        self.pl = Player(self, "./img/player.jpg", 1)
+        self.pl = Player(self, "./img/player.jpg", 10)
 
         for i in range(len(self.enemies)):
-            self.enemies[i] = EnemyCircle(self, "./img/enemy.jpg", 2, self.enemy_mov)
+            self.enemies[i] = EnemyCircle(self, "./img/enemy.jpg", 20, self.enemy_mov)
 
     def init_positions(self):
 
@@ -124,6 +136,7 @@ class Game:
         if self.isWin:
             print("Hooorraaaay")
             print("Win after %d iterations" %self.iter_num)
+            print("Max moves: ", self.player_max_moves)
         else:
             #update Q-Learning variabless
             self.iter_num += 1
@@ -131,12 +144,10 @@ class Game:
             if self.iter_num % 5 == 0:
                 self.player_max_moves += 5
 
-            if self.iter_num % 50 == 0:
-                self.learn.eps /= 2
+            if self.iter_num % 25 == 0:
+                if self.learn.eps > 0.2:
+                    self.learn.eps /= 2
 
             #restart the game
 
             self.gameContinues = True
-            self.game_loop()
-
-
