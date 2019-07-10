@@ -27,7 +27,7 @@ class Player:
             return
 
         # move player and update coordinates
-        self.rec = self.rec.move(self.move_dir[d])
+        self.rec.move(self.move_dir[d])
         self.mov_num += 1
 
         # reaching finish
@@ -38,13 +38,13 @@ class Player:
         # intersection logic with borders
         for line in self.game.map.lines:
             if self.rec.collidesWith(line):
-                self.rec = self.rec.move(self.move_dir[self.opposite_dir[d]])
+                self.rec.move(self.move_dir[self.opposite_dir[d]])
                 # This was the bottleneck previously
                 # Maybe optimize
                 # Add logic to punish if colliding with wall (in q-table)
 
     def move_simulation(self, d):
-        return (self.rec.tl[0] + self.move_dir[d][0], self.rec.tl[1] + self.move_dir[d][1])
+        return (self.rec.tl.x + self.move_dir[d][0], self.rec.tl.y + self.move_dir[d][1])
 
     # What is your purpose?
     def mov_back_simulation(self, d):

@@ -6,7 +6,6 @@ from rectangle import rect
 class Map:
     def __init__(self, game, level):
         self.level = level
-        self.game = game
 
         self.coor = []
         self.lines = []
@@ -18,6 +17,8 @@ class Map:
         self.border2 = []
         self.posx = []
         self.posy = []
+        self.start_x = []
+        self.start_y = []
 
         self.readFile(level)
         self.drawMap(level)
@@ -35,7 +36,7 @@ class Map:
         for line in f:
             if 'Init' in line:
                 break
-        self.game.start_x, self.game.start_y = map(int, f.readline().split(","))
+        self.start_x, self.start_y = map(int, f.readline().split(","))
         for line in f:
             if 'Enemies' in line:
                 break
