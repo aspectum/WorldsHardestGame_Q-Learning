@@ -1,11 +1,11 @@
 import pygame
 import sys
-import time
 
 from player import Player
 from enemy import EnemyCircle
 from qLearning import QLearning
 from map import Map
+
 
 class Game:
 
@@ -14,31 +14,30 @@ class Game:
 
     def __init__(self, w, h):
 
-        #screen sizes
+        # screen sizes
         self.width = w
         self.height = h
 
         self.sc = None
         self.createScreen(w, h)
 
-        #game info
+        # game info
         self.gameContinues = True
         self.isWin = False
         self.level = 1
 
-        #Player attributes
+        # Player attributes
         self.pl = None
         self.start_x = 0
         self.start_y = 0
 
-
-        #map of the game
+        # map of the game
         self.map = Map(self, 1)
 
-        #attributes for enemies
+        # attributes for enemies
         self.enemies = [None] * self.map.number_enemy
 
-        #attributes for Q-Learning with incremental learning
+        # attributes for Q-Learning with incremental learning
         self.learn = QLearning(self)
 
         self.iter_num = 0
@@ -59,17 +58,16 @@ class Game:
         self.sc.fill(Game.white)
         pygame.display.flip()
 
-    #main game functions
+    # main game functions
     def start(self):
 
-        #draw player, enemies and map
+        # draw player, enemies and map
         self.createEnv()
         self.game_loop()
 
     def game_loop(self):
-        time.sleep(10)
 
-        while not self.isWin:            
+        while not self.isWin:
             self.init_positions()
             self.pl.mov_num = 0
 
@@ -82,7 +80,7 @@ class Game:
 
                 self.clock.tick(30)
 
-                self.updateMap()
+                self.updateMap(self.level)
 
             # Probably can wrap this in a print state/status method
             print('Iteration: ', self.iter_num)
@@ -93,7 +91,7 @@ class Game:
             print('Q-Table size: ', qsz)
             self.endGame()
 
-    #functions used while game
+    # functions used while game
     def createEnv(self):
 
         self.sc.fill(Game.white)
@@ -101,14 +99,15 @@ class Game:
         self.pl = Player(self, "./img/player.jpg", 10)
 
         for i in range(len(self.enemies)):
-            self.enemies[i] = EnemyCircle(self, "./img/enemy.jpg", 20, self.map.enemy_mov[i], self.map.border1[i], self.map.border2[i])
+            self.enemies[i] = EnemyCircle(self, "./img/enemy.jpg", 20, self.map.enemy_mov[i],
+                                          self.map.border1[i], self.map.border2[i])
 
     def init_positions(self):
 
         self.pl.set_pos(self.start_x, self.start_y)
-        
+
         for i in range(len(self.enemies)):
-            self.enemies[i].set_pos(self.map.posx[i],self.map.posy[i])
+            self.enemies[i].set_pos(self.map.posx[i], self.map.posy[i])
 
     def check_input(self):
         for event in pygame.event.get():
@@ -123,7 +122,8 @@ class Game:
         self.sc.blit(self.pl.image, self.pl.rect)
 
         self.lbl_iter_num = self.myfont.render("Iter number: " + str(self.iter_num), 1, Game.black)
-        self.lbl_max_moves = self.myfont.render("Max moves: " + str(self.player_max_moves), 1, Game.black)
+        self.lbl_max_moves = self.myfont.render("Max moves: " + str(self.player_max_moves),
+                                                1, Game.black)
 
         self.sc.blit(self.lbl_iter_num, (20, 100))
         self.sc.blit(self.lbl_max_moves, (20, 130))
@@ -134,10 +134,10 @@ class Game:
 
         if self.isWin:
             print("Hooorraaaay")
-            print("Win after %d iterations" %self.iter_num)
+            print("Win after %d iterations" % self.iter_num)
             print("Max moves: ", self.player_max_moves)
         else:
-            #update Q-Learning variabless
+            # update Q-Learning variabless
             self.iter_num += 1
 
             if self.iter_num % 5 == 0:
@@ -147,6 +147,6 @@ class Game:
                 if self.learn.eps > 0.2:
                     self.learn.eps /= 2
 
-            #restart the game
+            # restart the game
 
             self.gameContinues = True

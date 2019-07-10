@@ -1,5 +1,6 @@
 import pygame
 
+
 class Map:
     def __init__(self, game, level):
         self.level = level
@@ -25,6 +26,7 @@ class Map:
         name += "./levels/" + "level" + str(lvl) + ".txt"
         f = open(name)
         self.readInfo(f)
+        f = open(name)
         self.parseInput(f)
 
     def readInfo(self, f):
@@ -43,7 +45,7 @@ class Map:
             self.enemy_mov.append((linha[2]))
             self.border1.append(int(linha[3]))
             self.border2.append(int(linha[4]))
-        
+
     def parseInput(self, f):
         for line in f:
             if 'Map' in line:
@@ -52,15 +54,15 @@ class Map:
             if 'End' in line:
                 break
             temp = line.split(' ')
-            self.coor.append((tuple(map(int, temp[0].split(","))), tuple(map(int, temp[1].split(",")))))
-
+            self.coor.append((tuple(map(int, temp[0].split(","))),
+                             tuple(map(int, temp[1].split(",")))))
 
     def drawMap(self, level):
         for c in self.coor:
             self.lines.append(pygame.draw.line(self.game.sc, self.game.black, c[0], c[1], 3))
-        
+
         self.drawFinish(level)
-    
+
     def drawFinish(self, level):
         name = ""
         name += "./levels/" + "level" + str(level) + ".txt"
@@ -70,9 +72,7 @@ class Map:
             if 'End' in line:
                 break
         linha = f.readline().split(",")
-        for x in range(0,4):
+        for x in range(0, 4):
             linha[x] = int(linha[x])
-        self.finish = pygame.draw.rect(self.game.sc, (0, 255, 0), [linha[0], linha[1], linha[2], linha[3]])
-
-
-    
+        self.finish = pygame.draw.rect(self.game.sc, (0, 255, 0),
+                                       [linha[0], linha[1], linha[2], linha[3]])

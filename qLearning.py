@@ -7,7 +7,6 @@
 
 import random
 from collections import defaultdict
-import numpy as np
 
 dirs = ["right", "left", "up", "down", "stay"]
 
@@ -21,8 +20,8 @@ class QLearning:
         self.lr = 0.3
         self.gamma = 0.9
 
-        #featural Q-Learning
-        self.w = [1, -10] #enemies, finish
+        # featural Q-Learning
+        self.w = [1, -10]  # enemies, finish
 
         self.q_value_table = self.mult_dim_dict(2, QValues, self)
 
@@ -74,7 +73,7 @@ class QValues:
         self.pl = self.QL.game.pl
 
         self.val = []
-        self.t = [] #time
+        self.t = []  # time
 
         self.sing_val = 0
 
@@ -84,7 +83,6 @@ class QValues:
             self.t.append(self.pl.mov_num)
             self.val.append(0)
 
-
         dist_finish = self.QL.dist2(self.QL.game.map.finish, self.pl.rect)
 
         reward = 100000000/(dist_finish + 1)
@@ -93,9 +91,8 @@ class QValues:
 
         self.val[self.t.index(self.pl.mov_num)] += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val[self.t.index(self.pl.mov_num)])
 
-
     def update_after_death(self):
-        if not self.pl.mov_num in self.t:
+        if self.pl.mov_num not in self.t:
             self.t.append(self.pl.mov_num)
             self.val.append(-3000)
         else:
