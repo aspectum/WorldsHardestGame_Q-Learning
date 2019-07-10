@@ -31,13 +31,12 @@ class Game:
         self.start_x = 0
         self.start_y = 0
 
-        #attributes for enemies
-        self.enemies = [None] * 9
-        self.enemy_mov = False
-        self.enemy_border = []
 
         #map of the game
         self.map = Map(self, 1)
+
+        #attributes for enemies
+        self.enemies = [None] * self.map.number_enemy
 
         #attributes for Q-Learning with incremental learning
         self.learn = QLearning(self)
@@ -102,25 +101,25 @@ class Game:
         self.pl = Player(self, "./img/player.jpg", 10)
 
         for i in range(len(self.enemies)):
-            self.enemies[i] = EnemyCircle(self, "./img/enemy.jpg", 20, self.enemy_mov)
+            self.enemies[i] = EnemyCircle(self, "./img/enemy.jpg", 20, self.map.enemy_mov[i], self.map.border1[i], self.map.border2[i])
 
     def init_positions(self):
 
         self.pl.set_pos(self.start_x, self.start_y)
-
+        
         for i in range(len(self.enemies)):
-            self.enemies[i].set_pos(260 + 50 * i, (self.enemy_border[0] + 1 if i % 2 == 0 else self.enemy_border[1] - 15))
+            self.enemies[i].set_pos(self.map.posx[i],self.map.posy[i])
 
     def check_input(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
 
-    def updateMap(self):
+    def updateMap(self, level):
         for e in self.enemies:
             e.move()
 
-        self.map.drawMap()
+        self.map.drawMap(level)
         self.sc.blit(self.pl.image, self.pl.rect)
 
         self.lbl_iter_num = self.myfont.render("Iter number: " + str(self.iter_num), 1, Game.black)

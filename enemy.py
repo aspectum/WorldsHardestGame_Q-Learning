@@ -2,11 +2,13 @@ import pygame
 
 class EnemyCircle:
 
-    def __init__(self, game, image, speed, hor):
+    def __init__(self, game, image, speed, hor, borderx, bordery):
 
         self.x, self.y = 0, 0
 
         self.hor = hor #bool for moving horizontally or not (vertically)
+        self.borderx = borderx
+        self.bordery = bordery
 
         self.game = game
         self.speed = speed
@@ -41,10 +43,9 @@ class EnemyCircle:
             self.y = self.rect.top
 
         self.game.sc.blit(self.image, self.rect)
-        
-        if self.hor and self.x >= self.game.enemy_border[1] or self.x < self.game.enemy_border[0] - self.w:
+        if self.hor and self.x >= self.bordery or self.x < self.borderx - self.w:
             self.speed *= -1
-        elif (not self.hor) and self.y > self.game.enemy_border[1] - self.h or self.y <= self.game.enemy_border[0]:
+        elif (not self.hor) and self.y > self.bordery - self.h or self.y <= self.borderx:
             self.speed *= -1
 
 
