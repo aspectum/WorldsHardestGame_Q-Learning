@@ -21,9 +21,8 @@ class watcher:
 
         self.clock_flag = clock_flag
 
-        if self.clock_flag:
-            self.tick_freq = 60
-            self.clock = pygame.time.Clock()
+        self.tick_freq = 60
+        self.clock = pygame.time.Clock()
 
         self.updateMap()
 

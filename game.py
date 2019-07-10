@@ -56,7 +56,7 @@ class Game:
 
     def game_loop(self):
         n = 1
-        k = 1
+        k = 0
         watch_enable = False
 
         while not self.isWin:
@@ -73,7 +73,7 @@ class Game:
                     if k > self.watch_duration:
                         watch_enable = False
                         n += 1
-                        k = 1
+                        k = 0
             else:
                 watch_enable = False
 
