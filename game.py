@@ -1,3 +1,5 @@
+import pickle
+
 from player import Player
 from enemy import EnemyCircle
 from qLearning import QLearning
@@ -150,6 +152,8 @@ class Game:
             print("Max moves: ", self.player_max_moves)
 
             if self.replay:
+                with open('replay.p', 'wb') as f:
+                    pickle.dump(self.iter_state, f)
                 self.w = watcher(self, self.watcher_clock_flag)
                 input('Press ENTER to start replay')
                 self.w.replay(self.iter_state)

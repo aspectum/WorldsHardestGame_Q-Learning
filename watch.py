@@ -21,10 +21,10 @@ class watcher:
 
         self.clock_flag = clock_flag
 
-        self.tick_freq = 60
+        self.tick_freq = 30
         self.clock = pygame.time.Clock()
 
-        self.updateMap()
+        # self.updateMap()
 
     def createScreen(self, w, h):
         pygame.init()
