@@ -2,6 +2,7 @@ from player import Player
 from enemy import EnemyCircle
 from qLearning import QLearning
 from map import Map
+from watch import watcher
 
 
 class Game:
@@ -18,13 +19,13 @@ class Game:
         # game info
         self.gameContinues = True
         self.isWin = False
-        self.level = 1
+        self.level = 0
 
         # Player attributes
         self.pl = None
 
         # map of the game
-        self.map = Map(self, 1)
+        self.map = Map(self, self.level)
 
         # attributes for enemies
         self.enemies = [None] * self.map.number_enemy
@@ -51,6 +52,7 @@ class Game:
 
         # draw player, enemies and map
         self.createEnv()
+        self.w = watcher(self)
         self.game_loop()
 
     def game_loop(self):
@@ -60,6 +62,8 @@ class Game:
             self.pl.mov_num = 0
 
             while self.gameContinues:
+                self.w.updateMap()
+                a = input()
                 self.learn.find_move()
                 self.updateMap(self.level)
 

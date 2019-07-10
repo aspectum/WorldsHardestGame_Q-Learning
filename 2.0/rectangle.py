@@ -4,7 +4,7 @@ class rect:
         self.br = point(br[0], br[1])
 
     def getPos(self):
-        return (self.tl, self.br)
+        return [self.tl.x, self.tl.y], [self.br.x, self.br.y]
 
     def move(self, direction):
         x = direction[0]
