@@ -7,18 +7,19 @@ from watch import watcher
 
 class Game:
 
-    def __init__(self, w, h):
+    def __init__(self, level=0, watch=False, watch_periodic=False, replay=False):
         # To show the game
-        self.watch = False
-
-        # screen sizes
-        self.width = w
-        self.height = h
+        self.watch = watch
+        self.watch_periodic = watch_periodic
+        self.replay = replay
+        self.watcher_clock_flag = False
+        self.watch_period = 50
+        self.watch_duration = 10
 
         # game info
         self.gameContinues = True
         self.isWin = False
-        self.level = 0
+        self.level = level
 
         # Player attributes
         self.pl = None
@@ -33,56 +34,76 @@ class Game:
         self.learn = QLearning(self)
 
         self.iter_num = 0
+
         self.player_max_moves = 100
-
-        # render text
-        self.lbl_iter_num = None
-        self.lbl_max_moves = None
-
-    def createScreen(self, w, h):
-        # pygame.init()
-        # self.sc = pygame.display.set_mode([w, h])
-        # self.sc.fill(Game.white)
-        # pygame.display.flip()
-        return
+        self.player_max_max_moves = 300
+        self.player_vel = 10
+        self.player_moves_step = 5
+        self.player_moves_interval = 5
+        self.eps_decrease_interval = 40
+        self.iteration_print_interval = 10
+        self.max_iterations = 9999
+        self.iter_state = []
 
     # main game functions
     def start(self):
 
         # draw player, enemies and map
         self.createEnv()
-        if self.watch:
-            self.w = watcher(self)
+        if self.watch or self.watch_periodic:
+            self.w = watcher(self, self.watcher_clock_flag)
         self.game_loop()
 
     def game_loop(self):
+        n = 1
+        k = 1
+        watch_enable = False
 
         while not self.isWin:
+            del self.iter_state[:]
+            self.iter_state = []
+            self.iter_state.append(self.iter_num)
+            self.iter_state.append(self.player_max_moves)
+            if self.watch:
+                watch_enable = True
+            elif self.watch_periodic:
+                if self.iter_num // (n * self.watch_period) > 0:
+                    watch_enable = True
+                    k += 1
+                    if k > self.watch_duration:
+                        watch_enable = False
+                        n += 1
+                        k = 1
+            else:
+                watch_enable = False
+
             self.init_positions()
             self.pl.mov_num = 0
 
             while self.gameContinues:
-                if self.watch:
+                if watch_enable:
                     self.w.updateMap()
                 # a = input()
                 self.learn.find_move()
                 self.updateMap(self.level)
+                if self.replay:
+                    self.save_state()
 
             # Probably can wrap this in a print state/status method
-            print('Iteration: ', self.iter_num)
-            qsz = 0
-            for i in self.learn.q_value_table:
-                for j in self.learn.q_value_table[i]:
-                    qsz += len(self.learn.q_value_table[i][j].t)
-            print('Q-Table size: ', qsz)
+            if self.iter_num % self.iteration_print_interval == 0:
+                self.print_status()
             self.endGame()
+
+            if self.iter_num > self.max_iterations:
+                print("Reached maximum of iterations and couldn't hit goal")
+                return
 
     # functions used while game
     def createEnv(self):
-        self.pl = Player(self, 10)
+        self.pl = Player(self, self.player_vel)
 
         for i in range(len(self.enemies)):
-            self.enemies[i] = EnemyCircle(self, 20, self.map.enemy_mov[i],
+            self.enemies[i] = EnemyCircle(self, 2*self.player_vel, self.map.enemy_mov[i],
                                           self.map.border1[i], self.map.border2[i])
 
     def init_positions(self):
@@ -100,20 +121,47 @@ class Game:
 
         # self.map.drawMap(level)
 
+    def print_status(self):
+        print('Iteration: ', self.iter_num)
+        qsz = 0
+        for i in self.learn.q_value_table:
+            for j in self.learn.q_value_table[i]:
+                qsz += len(self.learn.q_value_table[i][j].t)
+        print('Q-Table size: ', qsz)
+
+    def save_state(self):
+        player = self.pl.rec.getPos()
+
+        enemies = []
+        for e in self.enemies:
+            enemies.append(e.rec.getPos())
+
+        loop_state = []
+        loop_state.append(player)
+        loop_state.append(enemies)
+
+        self.iter_state.append(loop_state)
+
     def endGame(self):
 
         if self.isWin:
             print("Hooorraaaay")
             print("Win after %d iterations" % self.iter_num)
             print("Max moves: ", self.player_max_moves)
+
+            if self.replay:
+                self.w = watcher(self, self.watcher_clock_flag)
+                input('Press ENTER to start replay')
+                self.w.replay(self.iter_state)
         else:
             # update Q-Learning variabless
             self.iter_num += 1
 
-            if self.iter_num % 5 == 0:
-                self.player_max_moves += 5
+            if self.iter_num % self.player_moves_interval == 0:
+                if self.player_max_moves < self.player_max_max_moves:
+                    self.player_max_moves += self.player_moves_step
 
-            if self.iter_num % 40 == 0:
+            if self.iter_num % self.eps_decrease_interval == 0:
                 if self.learn.eps > 0.2:
                     self.learn.eps /= 2
 

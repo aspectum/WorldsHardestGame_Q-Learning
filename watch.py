@@ -7,7 +7,7 @@ class watcher:
     black = 0, 0, 0
     white = 255, 255, 255
 
-    def __init__(self, game):
+    def __init__(self, game, clock_flag=False):
         self.game = game
         self.sc = None
         self.createScreen(1000, 1000)
@@ -18,6 +18,13 @@ class watcher:
         self.lbl_max_moves = None
         self.player_im = pygame.image.load("./img/player.jpg").convert()
         self.enemy_im = pygame.image.load("./img/enemy.jpg").convert()
+
+        self.clock_flag = clock_flag
+
+        if self.clock_flag:
+            self.tick_freq = 60
+            self.clock = pygame.time.Clock()
+
         self.updateMap()
 
     def createScreen(self, w, h):
@@ -47,6 +54,9 @@ class watcher:
 
         pygame.display.update()
 
+        if self.clock_flag:
+            self.clock.tick(self.tick_freq)
+
     def drawMap(self):
         # for c in self.game.map.coor:
         #     pygame.draw.line(self.sc, watcher.black, c[0], c[1], 3)
@@ -70,3 +80,30 @@ class watcher:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+
+    def replay(self, state):
+        iter_num = state[0]
+        max_moves = state[1]
+
+        self.lbl_iter_num = self.myfont.render("Iter number: " + str(iter_num), 1, watcher.black)
+        self.lbl_max_moves = self.myfont.render("Max moves: " + str(max_moves),
+                                                1, watcher.black)
+
+        for i in range(2, len(state)):
+            self.check_input()
+            self.sc.fill(watcher.white)
+
+            tl = state[i][0]
+            self.sc.blit(self.player_im, tl)
+            for e in state[i][1]:
+                self.sc.blit(self.enemy_im, e)
+
+            self.drawMap()
+
+            self.sc.blit(self.lbl_iter_num, (20, 100))
+            self.sc.blit(self.lbl_max_moves, (20, 130))
+
+            pygame.display.update()
+
+            if self.clock_flag:
+                self.clock.tick(self.tick_freq)
