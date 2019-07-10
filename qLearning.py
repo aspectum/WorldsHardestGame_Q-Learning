@@ -1,5 +1,13 @@
+# TO-DO
+# - Change data structure for q-table in order to be able to save it (pickle, dump)
+# - Improve variable names for clarity
+# - Remove unused variables
+# - Of course, improve the q-learning algorithm and parameters as well
+########################################################################
+
 import random
 from collections import defaultdict
+import numpy as np
 
 dirs = ["right", "left", "up", "down", "stay"]
 
@@ -9,7 +17,9 @@ class QLearning:
         self.pl = game.pl
         self.game = game
 
-        self.eps = 0.64
+        self.eps = 0.5
+        self.lr = 0.3
+        self.gamma = 0.9
 
         #featural Q-Learning
         self.w = [1, -10] #enemies, finish
@@ -22,16 +32,8 @@ class QLearning:
         else:
             return defaultdict(lambda: self.mult_dim_dict(dim - 1, dict_type, params))
 
-    def dist_hor(self, obj1, obj2):
-        # horizontal distance
-        return abs(obj2.x - (obj1.x + obj1.w))
-
-    def dist_ver(self, obj1, obj2):
-        # vertical distance
-        if abs(obj2.x - obj1.x > 20):
-            return 500
-        else:
-            return abs(obj2.y - obj1.y)
+    def dist2(self, obj1, obj2):
+        return (obj1.centerx - obj2.centerx)**2 + (obj1.centery - obj2.centery)**2
 
     def find_move(self):
         r = random.random()
@@ -53,6 +55,16 @@ class QLearning:
 
         self.game.pl.move(self.q_value_table[x][y].find_best_move())
 
+    # Not sure if results are good with this
+    # def normalize_q_table(self):
+    #     for i in self.q_value_table:
+    #         for j in self.q_value_table[i]:
+    #             old_val = self.q_value_table[i][j].val
+    #             if old_val:
+    #                 mean = np.mean(old_val)
+    #                 new_val = [mean] * len(old_val)
+    #                 self.q_value_table[i][j].val = new_val
+
 
 class QValues:
     def __init__(self, QLearning):
@@ -68,25 +80,26 @@ class QValues:
 
     def update_value(self):
 
-        if self.pl.mov_num in self.t:
-            return
+        if self.pl.mov_num not in self.t:
+            self.t.append(self.pl.mov_num)
+            self.val.append(0)
 
-        #if self.sing_val != 0: return
 
-        dist_finish = self.QL.dist_hor(self.QL.game.map.finish, self.pl)
-        dist_enemy = self.QL.dist_ver(self.QL.game.enemies[0], self.pl)
+        dist_finish = self.QL.dist2(self.QL.game.map.finish, self.pl.rect)
 
-        self.t.append(self.pl.mov_num)
-        self.val.append(dist_enemy * self.QL.w[0] + dist_finish * self.QL.w[1])
+        reward = 100000000/(dist_finish + 1)
 
-        self.sing_val = dist_enemy * self.QL.w[0] + dist_finish * self.QL.w[1]
+        best_reward, _ = self.find_max_reward()
+
+        self.val[self.t.index(self.pl.mov_num)] += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val[self.t.index(self.pl.mov_num)])
+
 
     def update_after_death(self):
         if not self.pl.mov_num in self.t:
             self.t.append(self.pl.mov_num)
             self.val.append(-3000)
-
-            #self.sing_val = -3000
+        else:
+            self.val[self.t.index(self.pl.mov_num)] -= 3000
 
     def get_val_at_t(self, mov):
         if mov in self.t:
@@ -94,20 +107,18 @@ class QValues:
         else:
             return 0
 
-    def find_best_move(self):
-
+    def find_max_reward(self):
         li = []
 
         for d in dirs:
             x, y = self.pl.move_simulation(d)
             li.append(self.table[x][y].get_val_at_t(self.pl.mov_num + 1))
-            #li.append(self.table[x][y].sing_val)
-
-        print("right: %d, left: %d, up: %d, down: %d, stay %d" %(li[0], li[1], li[2], li[3], li[4]))
 
         maxi = max(li)
 
-        for i in range(len(li)):
-            if li[i] == maxi:
-                #print("action chosen: ", dirs[i])
-                return dirs[i]
+        return maxi, li
+
+    def find_best_move(self):
+        maxi, li = self.find_max_reward()
+
+        return dirs[li.index(maxi)]
