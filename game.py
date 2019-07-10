@@ -1,38 +1,30 @@
-import pygame
-import sys
-
 from player import Player
 from enemy import EnemyCircle
 from qLearning import QLearning
 from map import Map
+from watch import watcher
 
 
 class Game:
 
-    black = 0, 0, 0
-    white = 255, 255, 255
-
     def __init__(self, w, h):
+        # To show the game
+        self.watch = False
 
         # screen sizes
         self.width = w
         self.height = h
 
-        self.sc = None
-        self.createScreen(w, h)
-
         # game info
         self.gameContinues = True
         self.isWin = False
-        self.level = 1
+        self.level = 0
 
         # Player attributes
         self.pl = None
-        self.start_x = 0
-        self.start_y = 0
 
         # map of the game
-        self.map = Map(self, 5)
+        self.map = Map(self, self.level)
 
         # attributes for enemies
         self.enemies = [None] * self.map.number_enemy
@@ -43,26 +35,24 @@ class Game:
         self.iter_num = 0
         self.player_max_moves = 100
 
-        self.myfont = pygame.font.SysFont("monospace", 24)
-
         # render text
         self.lbl_iter_num = None
         self.lbl_max_moves = None
 
-        # Clock
-        self.clock = pygame.time.Clock()
-
     def createScreen(self, w, h):
-        pygame.init()
-        self.sc = pygame.display.set_mode([w, h])
-        self.sc.fill(Game.white)
-        pygame.display.flip()
+        # pygame.init()
+        # self.sc = pygame.display.set_mode([w, h])
+        # self.sc.fill(Game.white)
+        # pygame.display.flip()
+        return
 
     # main game functions
     def start(self):
 
         # draw player, enemies and map
         self.createEnv()
+        if self.watch:
+            self.w = watcher(self)
         self.game_loop()
 
     def game_loop(self):
@@ -72,13 +62,10 @@ class Game:
             self.pl.mov_num = 0
 
             while self.gameContinues:
-
-                self.sc.fill(Game.white)
-                self.check_input()
+                if self.watch:
+                    self.w.updateMap()
+                # a = input()
                 self.learn.find_move()
-
-                self.clock.tick(30)
-
                 self.updateMap(self.level)
 
             # Probably can wrap this in a print state/status method
@@ -92,42 +79,26 @@ class Game:
 
     # functions used while game
     def createEnv(self):
-
-        self.sc.fill(Game.white)
-
-        self.pl = Player(self, "./img/player.jpg", 10)
+        self.pl = Player(self, 10)
 
         for i in range(len(self.enemies)):
-            self.enemies[i] = EnemyCircle(self, "./img/enemy.jpg", 10, self.map.enemy_mov[i],
+            self.enemies[i] = EnemyCircle(self, 20, self.map.enemy_mov[i],
                                           self.map.border1[i], self.map.border2[i])
 
     def init_positions(self):
 
-        self.pl.set_pos(self.start_x, self.start_y)
+        # self.pl.set_pos(self.map.start_x, self.map.start_y)
+        self.pl.rec.moveTo((self.map.start_x, self.map.start_y))
 
         for i in range(len(self.enemies)):
-            self.enemies[i].set_pos(self.map.posx[i], self.map.posy[i])
-
-    def check_input(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                sys.exit()
+            # self.enemies[i].set_pos(self.map.posx[i], self.map.posy[i])
+            self.enemies[i].rec.moveTo((self.map.posx[i], self.map.posy[i]))
 
     def updateMap(self, level):
         for e in self.enemies:
             e.move()
 
-        self.map.drawMap()
-        self.sc.blit(self.pl.image, self.pl.rect)
-
-        self.lbl_iter_num = self.myfont.render("Iter number: " + str(self.iter_num), 1, Game.black)
-        self.lbl_max_moves = self.myfont.render("Max moves: " + str(self.player_max_moves),
-                                                1, Game.black)
-
-        self.sc.blit(self.lbl_iter_num, (20, 100))
-        self.sc.blit(self.lbl_max_moves, (20, 130))
-
-        pygame.display.update()
+        # self.map.drawMap(level)
 
     def endGame(self):
 
@@ -142,7 +113,7 @@ class Game:
             if self.iter_num % 5 == 0:
                 self.player_max_moves += 5
 
-            if self.iter_num % 25 == 0:
+            if self.iter_num % 40 == 0:
                 if self.learn.eps > 0.2:
                     self.learn.eps /= 2
 

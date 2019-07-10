@@ -16,8 +16,8 @@ class QLearning:
         self.pl = game.pl
         self.game = game
 
-        self.eps = 0.5
-        self.lr = 0.3
+        self.eps = 0.8
+        self.lr = 0.4
         self.gamma = 0.9
 
         # featural Q-Learning
@@ -32,7 +32,7 @@ class QLearning:
             return defaultdict(lambda: self.mult_dim_dict(dim - 1, dict_type, params))
 
     def dist2(self, obj1, obj2):
-        return (obj1.centerx - obj2.centerx)**2 + (obj1.centery - obj2.centery)**2
+        return (obj1.tl.x - obj2.tl.x)**2 + (obj1.tl.y - obj2.tl.y)**2
 
     def find_move(self):
         r = random.random()
@@ -42,7 +42,7 @@ class QLearning:
         else:
             self.move_optimally()
 
-        x, y = self.game.pl.x, self.game.pl.y
+        x, y = self.game.pl.rec.tl.x, self.game.pl.rec.tl.y
         self.q_value_table[x][y].update_value()
 
     def move_randomly(self):
@@ -50,7 +50,7 @@ class QLearning:
         self.game.pl.move(dirs[i])
 
     def move_optimally(self):
-        x, y = self.game.pl.x, self.game.pl.y
+        x, y = self.game.pl.rec.tl.x, self.game.pl.rec.tl.y
 
         self.game.pl.move(self.q_value_table[x][y].find_best_move())
 
@@ -83,7 +83,7 @@ class QValues:
             self.t.append(self.pl.mov_num)
             self.val.append(0)
 
-        dist_finish = self.QL.dist2(self.QL.game.map.finish, self.pl.rect)
+        dist_finish = self.QL.dist2(self.QL.game.map.finish, self.pl.rec)
 
         reward = 100000000/(dist_finish + 1)
 

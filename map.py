@@ -1,10 +1,11 @@
-import pygame
+import sys
+
+from rectangle import rect
 
 
 class Map:
     def __init__(self, game, level):
         self.level = level
-        self.game = game
 
         self.coor = []
         self.lines = []
@@ -16,9 +17,11 @@ class Map:
         self.border2 = []
         self.posx = []
         self.posy = []
+        self.start_x = []
+        self.start_y = []
 
         self.readFile(level)
-        self.drawMap()
+        self.drawMap(level)
 
     def readFile(self, lvl):
 
@@ -33,7 +36,7 @@ class Map:
         for line in f:
             if 'Init' in line:
                 break
-        self.game.start_x, self.game.start_y = map(int, f.readline().split(","))
+        self.start_x, self.start_y = map(int, f.readline().split(","))
         for line in f:
             if 'Enemies' in line:
                 break
@@ -60,21 +63,65 @@ class Map:
             self.coor.append((tuple(map(int, temp[0].split(","))),
                              tuple(map(int, temp[1].split(",")))))
 
-    def drawMap(self):
+    def drawMap(self, level):
         for c in self.coor:
-            self.lines.append(pygame.draw.line(self.game.sc, self.game.black, c[0], c[1], 3))
+            self.lines.append(self._drawLine(c[0], c[1], 3))
 
-        self.drawFinish()
+        self.drawFinish(level)
 
-    def drawFinish(self):
+    def drawFinish(self, level):
         name = ""
-        name += "./levels/" + "level" + str(self.level) + ".txt"
+        name += "./levels/" + "level" + str(level) + ".txt"
         f = open(name)
+
         for line in f:
             if 'End' in line:
                 break
         linha = f.readline().split(",")
         for x in range(0, 4):
             linha[x] = int(linha[x])
-        self.finish = pygame.draw.rect(self.game.sc, (0, 255, 0),
-                                       [linha[0], linha[1], linha[2], linha[3]])
+        self.finish = self._drawRect((linha[0], linha[1]), linha[2], linha[3])
+
+    def _drawLine(self, start, finish, thickness):
+        if start[0] == finish[0]:   # Vertical
+            if start[1] > finish[1]:
+                temp = start
+                start = finish
+                finish = temp
+            tl_x = start[0] - 1
+            tl_y = start[1]
+            tl = (tl_x, tl_y)
+
+            br_x = finish[0] - 1
+            br_y = finish[1]
+            br = (br_x, br_y)
+
+            line = rect(tl, br)
+        elif start[1] == finish[1]:   # Horizontal
+            if start[0] > finish[0]:
+                temp = start
+                start = finish
+                finish = temp
+            tl_x = start[0]
+            tl_y = start[1] - 1
+            tl = (tl_x, tl_y)
+
+            br_x = finish[0]
+            br_y = finish[1] + 1
+            br = (br_x, br_y)
+
+            line = rect(tl, br)
+        else:   # Diagonal, shouldn't happen
+            print("ERROR: Level shouldn't have diagonal lines!")
+            sys.exit()
+
+        return line
+
+    def _drawRect(self, tl, w, h):
+        br_x = tl[0] + w
+        br_y = tl[1] + h
+        br = (br_x, br_y)
+
+        rec = rect(tl, br)
+
+        return rec
