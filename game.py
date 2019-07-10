@@ -32,7 +32,7 @@ class Game:
         self.start_y = 0
 
         # map of the game
-        self.map = Map(self, 1)
+        self.map = Map(self, 5)
 
         # attributes for enemies
         self.enemies = [None] * self.map.number_enemy
@@ -75,7 +75,6 @@ class Game:
 
                 self.sc.fill(Game.white)
                 self.check_input()
-
                 self.learn.find_move()
 
                 self.clock.tick(30)
@@ -99,7 +98,7 @@ class Game:
         self.pl = Player(self, "./img/player.jpg", 10)
 
         for i in range(len(self.enemies)):
-            self.enemies[i] = EnemyCircle(self, "./img/enemy.jpg", 20, self.map.enemy_mov[i],
+            self.enemies[i] = EnemyCircle(self, "./img/enemy.jpg", 10, self.map.enemy_mov[i],
                                           self.map.border1[i], self.map.border2[i])
 
     def init_positions(self):
@@ -118,7 +117,7 @@ class Game:
         for e in self.enemies:
             e.move()
 
-        self.map.drawMap(level)
+        self.map.drawMap()
         self.sc.blit(self.pl.image, self.pl.rect)
 
         self.lbl_iter_num = self.myfont.render("Iter number: " + str(self.iter_num), 1, Game.black)

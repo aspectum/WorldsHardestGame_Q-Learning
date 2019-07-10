@@ -18,7 +18,7 @@ class Map:
         self.posy = []
 
         self.readFile(level)
-        self.drawMap(level)
+        self.drawMap()
 
     def readFile(self, lvl):
 
@@ -42,7 +42,10 @@ class Map:
             linha = f.readline().split(",")
             self.posx.append(int(linha[0]))
             self.posy.append(int(linha[1]))
-            self.enemy_mov.append((linha[2]))
+            if linha[2] == 'True':
+                self.enemy_mov.append(True)
+            else:
+                self.enemy_mov.append(False)
             self.border1.append(int(linha[3]))
             self.border2.append(int(linha[4]))
 
@@ -57,17 +60,16 @@ class Map:
             self.coor.append((tuple(map(int, temp[0].split(","))),
                              tuple(map(int, temp[1].split(",")))))
 
-    def drawMap(self, level):
+    def drawMap(self):
         for c in self.coor:
             self.lines.append(pygame.draw.line(self.game.sc, self.game.black, c[0], c[1], 3))
 
-        self.drawFinish(level)
+        self.drawFinish()
 
-    def drawFinish(self, level):
+    def drawFinish(self):
         name = ""
-        name += "./levels/" + "level" + str(level) + ".txt"
+        name += "./levels/" + "level" + str(self.level) + ".txt"
         f = open(name)
-
         for line in f:
             if 'End' in line:
                 break

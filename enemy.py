@@ -44,7 +44,7 @@ class EnemyCircle:
             self.y = self.rect.top
 
         self.game.sc.blit(self.image, self.rect)
-        if self.hor and self.x >= self.bordery or self.x < self.borderx - self.w:
+        if (self.hor and (self.x > self.bordery or self.x < self.borderx)):
             self.speed *= -1
-        elif (not self.hor) and self.y > self.bordery - self.h or self.y <= self.borderx:
+        elif (not self.hor and (self.y > self.bordery or self.y < self.borderx)):
             self.speed *= -1
