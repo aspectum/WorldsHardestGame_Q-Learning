@@ -24,7 +24,7 @@ class EnemyCircle:
         else:
             self.rec.move((0, self.speed))
 
-        if self.hor and self.rec.tl.x >= self.border2 or self.rec.br.x < self.border1:
+        if (self.hor and (self.rec.br.x > self.border2 or self.rec.tl.x < self.border1)):
             self.speed *= -1
-        elif (not self.hor) and (self.rec.br.y > self.border2 or self.rec.tl.y <= self.border1):
+        elif (not self.hor and (self.rec.br.y > self.border2 or self.rec.tl.y < self.border1)):
             self.speed *= -1
