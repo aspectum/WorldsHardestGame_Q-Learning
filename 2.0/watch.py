@@ -48,8 +48,14 @@ class watcher:
         pygame.display.update()
 
     def drawMap(self):
-        for c in self.game.map.coor:
-            pygame.draw.line(self.sc, watcher.black, c[0], c[1], 3)
+        # for c in self.game.map.coor:
+        #     pygame.draw.line(self.sc, watcher.black, c[0], c[1], 3)
+        for line in self.game.map.lines:
+            w = line.br.x - line.tl.x
+            h = line.br.y - line.tl.y
+            # rec = pygame.rect(self.game.map.finish.tl.x, self.game.map.finish.tl.y, w, h)
+            pygame.draw.rect(self.sc, watcher.black,
+                             [line.tl.x, line.tl.y, w, h])
 
         self.drawFinish()
 

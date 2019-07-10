@@ -20,7 +20,7 @@ class rect:
         self.tl.x += dx
         self.tl.y += dy
         self.br.x += dx
-        self.br.x += dy
+        self.br.y += dy
 
     def collidesWith(self, rec):
         if (self.tl.x > rec.br.x) or (rec.tl.x > self.br.x):

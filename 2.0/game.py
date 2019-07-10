@@ -7,10 +7,9 @@ from watch import watcher
 
 class Game:
 
-    black = 0, 0, 0
-    white = 255, 255, 255
-
     def __init__(self, w, h):
+        # To show the game
+        self.watch = False
 
         # screen sizes
         self.width = w
@@ -52,7 +51,8 @@ class Game:
 
         # draw player, enemies and map
         self.createEnv()
-        self.w = watcher(self)
+        if self.watch:
+            self.w = watcher(self)
         self.game_loop()
 
     def game_loop(self):
@@ -62,8 +62,9 @@ class Game:
             self.pl.mov_num = 0
 
             while self.gameContinues:
-                self.w.updateMap()
-                a = input()
+                if self.watch:
+                    self.w.updateMap()
+                # a = input()
                 self.learn.find_move()
                 self.updateMap(self.level)
 

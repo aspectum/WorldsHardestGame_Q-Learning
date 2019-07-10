@@ -45,7 +45,10 @@ class Map:
             linha = f.readline().split(",")
             self.posx.append(int(linha[0]))
             self.posy.append(int(linha[1]))
-            self.enemy_mov.append((linha[2]))
+            if linha[2] == 'True':
+                self.enemy_mov.append(True)
+            else:
+                self.enemy_mov.append(False)
             self.border1.append(int(linha[3]))
             self.border2.append(int(linha[4]))
 
@@ -81,6 +84,10 @@ class Map:
 
     def _drawLine(self, start, finish, thickness):
         if start[0] == finish[0]:   # Vertical
+            if start[1] > finish[1]:
+                temp = start
+                start = finish
+                finish = temp
             tl_x = start[0] - 1
             tl_y = start[1]
             tl = (tl_x, tl_y)
@@ -91,6 +98,10 @@ class Map:
 
             line = rect(tl, br)
         elif start[1] == finish[1]:   # Horizontal
+            if start[0] > finish[0]:
+                temp = start
+                start = finish
+                finish = temp
             tl_x = start[0]
             tl_y = start[1] - 1
             tl = (tl_x, tl_y)
