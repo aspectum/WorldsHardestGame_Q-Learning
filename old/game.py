@@ -1,0 +1,151 @@
+import pygame
+import sys
+
+from player import Player
+from enemy import EnemyCircle
+from qLearning import QLearning
+from map import Map
+
+
+class Game:
+
+    black = 0, 0, 0
+    white = 255, 255, 255
+
+    def __init__(self, w, h):
+
+        # screen sizes
+        self.width = w
+        self.height = h
+
+        self.sc = None
+        self.createScreen(w, h)
+
+        # game info
+        self.gameContinues = True
+        self.isWin = False
+        self.level = 1
+
+        # Player attributes
+        self.pl = None
+        self.start_x = 0
+        self.start_y = 0
+
+        # map of the game
+        self.map = Map(self, 5)
+
+        # attributes for enemies
+        self.enemies = [None] * self.map.number_enemy
+
+        # attributes for Q-Learning with incremental learning
+        self.learn = QLearning(self)
+
+        self.iter_num = 0
+        self.player_max_moves = 100
+
+        self.myfont = pygame.font.SysFont("monospace", 24)
+
+        # render text
+        self.lbl_iter_num = None
+        self.lbl_max_moves = None
+
+        # Clock
+        self.clock = pygame.time.Clock()
+
+    def createScreen(self, w, h):
+        pygame.init()
+        self.sc = pygame.display.set_mode([w, h])
+        self.sc.fill(Game.white)
+        pygame.display.flip()
+
+    # main game functions
+    def start(self):
+
+        # draw player, enemies and map
+        self.createEnv()
+        self.game_loop()
+
+    def game_loop(self):
+
+        while not self.isWin:
+            self.init_positions()
+            self.pl.mov_num = 0
+
+            while self.gameContinues:
+
+                self.sc.fill(Game.white)
+                self.check_input()
+                self.learn.find_move()
+
+                self.clock.tick(30)
+
+                self.updateMap(self.level)
+
+            # Probably can wrap this in a print state/status method
+            print('Iteration: ', self.iter_num)
+            qsz = 0
+            for i in self.learn.q_value_table:
+                for j in self.learn.q_value_table[i]:
+                    qsz += len(self.learn.q_value_table[i][j].t)
+            print('Q-Table size: ', qsz)
+            self.endGame()
+
+    # functions used while game
+    def createEnv(self):
+
+        self.sc.fill(Game.white)
+
+        self.pl = Player(self, "./img/player.jpg", 10)
+
+        for i in range(len(self.enemies)):
+            self.enemies[i] = EnemyCircle(self, "./img/enemy.jpg", 10, self.map.enemy_mov[i],
+                                          self.map.border1[i], self.map.border2[i])
+
+    def init_positions(self):
+
+        self.pl.set_pos(self.start_x, self.start_y)
+
+        for i in range(len(self.enemies)):
+            self.enemies[i].set_pos(self.map.posx[i], self.map.posy[i])
+
+    def check_input(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+
+    def updateMap(self, level):
+        for e in self.enemies:
+            e.move()
+
+        self.map.drawMap()
+        self.sc.blit(self.pl.image, self.pl.rect)
+
+        self.lbl_iter_num = self.myfont.render("Iter number: " + str(self.iter_num), 1, Game.black)
+        self.lbl_max_moves = self.myfont.render("Max moves: " + str(self.player_max_moves),
+                                                1, Game.black)
+
+        self.sc.blit(self.lbl_iter_num, (20, 100))
+        self.sc.blit(self.lbl_max_moves, (20, 130))
+
+        pygame.display.update()
+
+    def endGame(self):
+
+        if self.isWin:
+            print("Hooorraaaay")
+            print("Win after %d iterations" % self.iter_num)
+            print("Max moves: ", self.player_max_moves)
+        else:
+            # update Q-Learning variabless
+            self.iter_num += 1
+
+            if self.iter_num % 5 == 0:
+                self.player_max_moves += 5
+
+            if self.iter_num % 25 == 0:
+                if self.learn.eps > 0.2:
+                    self.learn.eps /= 2
+
+            # restart the game
+
+            self.gameContinues = True
