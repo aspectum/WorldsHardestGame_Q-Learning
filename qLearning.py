@@ -86,7 +86,7 @@ class QValues:
 
         best_reward, _ = self.find_max_reward()
 
-        self.val[self.t.index(self.pl.mov_num)] += self.QL.lr * (self.QL.gamma * best_reward - self.val[self.t.index(self.pl.mov_num)])
+        self.val[self.t.index(self.pl.mov_num)] += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val[self.t.index(self.pl.mov_num)])
 
     def update_after_death(self):
         if self.pl.mov_num not in self.t:
