@@ -13,7 +13,7 @@ class QLearning_offline:
         self.lr = 0.4
         self.gamma = 0.9
 
-        self.q_value_table = self.mult_dim_dict(2, QValues, self)
+        self.q_value_table = self.mult_dim_dict(2, QValues_offline, self)
 
     def mult_dim_dict(self, dim, dict_type, params):
         if dim == 1:
@@ -45,7 +45,7 @@ class QLearning_offline:
         self.game.pl.move(self.q_value_table[x][y].find_best_move())
 
 
-class QValues:
+class QValues_offline:
     def __init__(self, QLearning):
 
         self.QL = QLearning
@@ -66,7 +66,7 @@ class QValues:
         self.val -= 3000
 
     def update_wall_colision(self):
-        self.val -= 500
+        self.val -= 50000
 
     def get_val_at_t(self, mov):
         return self.val
