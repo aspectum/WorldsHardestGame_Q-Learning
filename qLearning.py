@@ -51,16 +51,6 @@ class QLearning:
 
         self.game.pl.move(self.q_value_table[x][y].find_best_move())
 
-    # Not sure if results are good with this
-    # def normalize_q_table(self):
-    #     for i in self.q_value_table:
-    #         for j in self.q_value_table[i]:
-    #             old_val = self.q_value_table[i][j].val
-    #             if old_val:
-    #                 mean = np.mean(old_val)
-    #                 new_val = [mean] * len(old_val)
-    #                 self.q_value_table[i][j].val = new_val
-
 
 class QValues:
     def __init__(self, QLearning):
@@ -71,8 +61,6 @@ class QValues:
 
         self.val = []
         self.t = []  # time
-
-        self.sing_val = 0
 
     def update_value(self):
 
