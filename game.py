@@ -46,6 +46,7 @@ class Game:
         self.iteration_print_interval = 10
         self.max_iterations = 9999
         self.iter_state = []
+        self.colision = False
 
     # main game functions
     def start(self):
