@@ -45,22 +45,28 @@ class Game:
         self.iteration_print_interval = 10
         self.max_iterations = 9999
         self.iter_state = []
-        self.colision = False
+        self.colision = True
 
         # attributes for Q-Learning with incremental learning
         self.learn = QLearning(self)
         self.learn_offline = QLearning_offline(self)
-        
+
+        # if not self.colision:
+        #     self.learn = self.learn_offline
 
     # main game functions
     def start(self):
         if self.colision:
             temp.load_online(self)
+        else:
+            self.learn = self.learn_offline
         # draw player, enemies and map
         self.createEnv()
         if self.watch or self.watch_periodic:
             self.w = watcher(self, self.watcher_clock_flag)
         self.game_loop()
+        if not self.colision:
+            temp.save_offline(self)
 
     def game_loop(self):
         n = 1
@@ -92,10 +98,11 @@ class Game:
                 if watch_enable:
                     self.w.updateMap()
                 # a = input()
-                if self.colision:
-                    self.learn.find_move()
-                else:
-                    self.learn_offline.find_move()
+                self.learn.find_move()
+                # if self.colision:
+                #     self.learn.find_move()
+                # else:
+                #     self.learn_offline.find_move()
                 self.updateMap(self.level)
                 if self.replay:
                     self.save_state()
@@ -139,10 +146,10 @@ class Game:
             for i in self.learn.q_value_table:
                 for j in self.learn.q_value_table[i]:
                     qsz += len(self.learn.q_value_table[i][j].t)
-        #else:
+        # else:
         #    for i in self.learn_offline.q_value_table:
         #       for j in self.learn_offline.q_value_table[i]:
-                  #qsz += len(self.learn_offline.q_value_table[i][j])
+                # qsz += len(self.learn_offline.q_value_table[i][j])
 
         print('Q-Table size: ', qsz)
 
@@ -160,13 +167,16 @@ class Game:
         self.iter_state.append(loop_state)
 
     def endGame(self):
-
+        self.iter_num += 1
         if self.isWin:
             print("Hooorraaaay")
             print("Win after %d iterations" % self.iter_num)
             print("Max moves: ", self.player_max_moves)
+            print("Moves used: ", self.pl.mov_num)
             if not self.colision:
-                temp.save_offline(self)
+                # temp.save_offline(self)
+                self.isWin = False
+                self.gameContinues = True
             if self.replay:
                 with open('replay.p', 'wb') as f:
                     pickle.dump(self.iter_state, f)
@@ -174,9 +184,6 @@ class Game:
                 input('Press ENTER to start replay')
                 self.w.replay(self.iter_state)
         else:
-            # update Q-Learning variabless
-            self.iter_num += 1
-
             if self.iter_num % self.player_moves_interval == 0:
                 if self.player_max_moves < self.player_max_max_moves:
                     self.player_max_moves += self.player_moves_step
@@ -184,8 +191,8 @@ class Game:
             if self.iter_num % self.eps_decrease_interval == 0:
                 if self.learn.eps > 0.2:
                     self.learn.eps /= 2
-                if self.learn_offline.eps>0.2:
-                    self.learn.eps /= 2
+                # if self.learn_offline.eps > 0.2:
+                #     self.learn.eps /= 2
 
             # restart the game
 

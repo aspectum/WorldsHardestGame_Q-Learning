@@ -34,6 +34,7 @@ class Player:
         if self.rec.collidesWith(self.game.map.finish):
             self.game.gameContinues = False
             self.game.isWin = True
+            self.game.learn.q_value_table[self.rec.tl.x][self.rec.tl.y].update_game_won()
 
         # intersection logic with borders
         for line in self.game.map.lines:

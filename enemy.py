@@ -16,7 +16,6 @@ class EnemyCircle:
 
     def move(self):
         if self.rec.collidesWith(self.game.pl.rec) and self.game.colision:
-            print ("Dieded")
             self.game.gameContinues = False
             self.game.learn.q_value_table[self.game.pl.rec.tl.x][self.game.pl.rec.tl.y].update_after_death()
 

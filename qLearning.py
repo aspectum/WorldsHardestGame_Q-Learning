@@ -60,20 +60,21 @@ class QValues:
         self.pl = self.QL.game.pl
         self.val = []
         self.t = []  # time
+        self.init_val = 0
 
     def update_value(self):
 
         if self.pl.mov_num not in self.t:
             self.t.append(self.pl.mov_num)
-            self.val.append(self.learn_offline.q_value_table[x][y].val)
+            self.val.append(self.init_val)
 
-        dist_finish = self.QL.dist2(self.QL.game.map.finish, self.pl.rec)
+        # dist_finish = self.QL.dist2(self.QL.game.map.finish, self.pl.rec)
 
-        reward = 10000000/(dist_finish + 1)
+        # reward = 10000000/(dist_finish + 1)
 
         best_reward, _ = self.find_max_reward()
 
-        self.val[self.t.index(self.pl.mov_num)] += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val[self.t.index(self.pl.mov_num)])
+        self.val[self.t.index(self.pl.mov_num)] += self.QL.lr * (self.QL.gamma * best_reward - self.val[self.t.index(self.pl.mov_num)])
 
     def update_after_death(self):
         if self.pl.mov_num not in self.t:
@@ -89,11 +90,18 @@ class QValues:
         else:
             self.val[self.t.index(self.pl.mov_num)] -= 500
 
+    def update_game_won(self):
+        if self.pl.mov_num not in self.t:
+            self.t.append(self.pl.mov_num)
+            self.val.append(100000 / self.QL.game.pl.mov_num)
+        else:
+            self.val[self.t.index(self.pl.mov_num)] += 100000 / self.QL.game.pl.mov_num
+
     def get_val_at_t(self, mov):
         if mov in self.t:
             return self.val[self.t.index(mov)]
         else:
-            return 0
+            return self.init_val
 
     def find_max_reward(self):
         li = []

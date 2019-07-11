@@ -56,8 +56,8 @@ class QValues_offline:
 
     def update_value(self):
 
-        dist_finish = self.QL.dist2(self.QL.game.map.finish, self.pl.rec)
-        reward = 10000000/(dist_finish + 1)
+        # dist_finish = self.QL.dist2(self.QL.game.map.finish, self.pl.rec)
+        reward = -300
         best_reward, _ = self.find_max_reward()
 
         self.val += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val)
@@ -66,7 +66,10 @@ class QValues_offline:
         self.val -= 3000
 
     def update_wall_colision(self):
-        self.val -= 50000
+        self.val -= 1000
+
+    def update_game_won(self):
+        self.val += 100000 / self.QL.game.pl.mov_num
 
     def get_val_at_t(self, mov):
         return self.val
