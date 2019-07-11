@@ -94,6 +94,8 @@ class Game:
 
             self.init_positions()
             self.pl.mov_num = 0
+            if self.checkpoints:
+                self.learn.active_checkpoint = 0
 
             while self.gameContinues:
                 if watch_enable:

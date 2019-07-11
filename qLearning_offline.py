@@ -1,5 +1,6 @@
 import random
 from collections import defaultdict
+import math
 
 dirs = ["right", "left", "up", "down", "stay"]
 
@@ -58,12 +59,13 @@ class QValues_offline:
 
     def update_value(self):
 
-        dist = self.QL.dist2(self.QL.game.map.checkpoints[self.QL.active_checkpoint], self.pl.rec)
+        # dist = self.QL.dist2(self.QL.game.map.checkpoints[self.QL.active_checkpoint], self.pl.rec)
 
-        reward = 10000 / (dist + 1)
+        # reward = 1 / math.sqrt(dist + 1)
         best_reward, _ = self.find_max_reward()
 
-        self.val += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val)
+        # self.val += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val)
+        self.val += self.QL.lr * (self.QL.gamma * best_reward - self.val)
 
     def update_after_death(self):
         self.val -= 3000
@@ -72,13 +74,10 @@ class QValues_offline:
         self.val -= 1000
 
     def update_game_won(self):
-        # self.val += 100000 / self.QL.game.pl.mov_num
-        self.val += 10000
+        self.val += 100000 / self.QL.game.pl.mov_num
 
     def update_checkpoint(self):
-        self.val = 250
         if self.QL.active_checkpoint + 1 < len(self.QL.game.map.checkpoints):
-            self.QL.eps = 0.3
             self.QL.active_checkpoint += 1
 
     def get_val_at_t(self, mov):

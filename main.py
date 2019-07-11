@@ -3,7 +3,7 @@ import time
 
 start = time.time()
 
-game = Game(level=0, watch=False, watch_periodic=True, replay=True)
+game = Game(level=0, watch=False, watch_periodic=True, replay=False)
 # watch overrides watch_periodic
 
 # General parameters
@@ -17,9 +17,9 @@ game.iteration_print_interval = 50
 game.max_iterations = 10000
 
 # Q-Learning parameters
-game.learn.eps = 0.8
-game.learn.lr = 0.3
-game.learn.gamma = 0.9
+game.learn_offline.eps = 0.8
+game.learn_offline.lr = 0.4
+game.learn_offline.gamma = 0.8
 
 # Watcher parameters
 game.watcher_clock_flag = True
