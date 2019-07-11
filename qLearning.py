@@ -58,7 +58,6 @@ class QValues:
         self.QL = QLearning
         self.table = self.QL.q_value_table
         self.pl = self.QL.game.pl
-
         self.val = []
         self.t = []  # time
 
@@ -66,7 +65,7 @@ class QValues:
 
         if self.pl.mov_num not in self.t:
             self.t.append(self.pl.mov_num)
-            self.val.append(0)
+            self.val.append(self.learn_offline.q_value_table[x][y].val)
 
         dist_finish = self.QL.dist2(self.QL.game.map.finish, self.pl.rec)
 
