@@ -29,3 +29,5 @@ Enemies
 715,510,False,225,525
 250,400,True,250,750
 735,350,True,250,750
+CheckPoints
+0

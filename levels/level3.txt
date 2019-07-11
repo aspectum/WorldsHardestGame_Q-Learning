@@ -52,3 +52,5 @@ Enemies
 585,320,True,500,600
 500,270,True,500,600
 585,220,True,500,600
+CheckPoints
+0
