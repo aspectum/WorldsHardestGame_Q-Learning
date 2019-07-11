@@ -47,6 +47,7 @@ class Game:
         self.iter_state = []
         self.colision = True
         self.checkpoints = False
+        self.constant_eps = False
 
         # attributes for Q-Learning with incremental learning
         self.learn = QLearning(self)
@@ -191,7 +192,7 @@ class Game:
                 if self.player_max_moves < self.player_max_max_moves:
                     self.player_max_moves += self.player_moves_step
 
-            if self.iter_num % self.eps_decrease_interval == 0:
+            if (not self.constant_eps) and (self.iter_num % self.eps_decrease_interval == 0):
                 if self.learn.eps > 0.2:
                     self.learn.eps /= 2
                 # if self.learn_offline.eps > 0.2:
