@@ -19,6 +19,9 @@ class Map:
         self.posy = []
         self.start_x = []
         self.start_y = []
+        self.number_checks = 0
+        self.checkpointx = []
+        self.checkpointy = []
 
         self.readFile(level)
         self.drawMap(level)
@@ -51,6 +54,12 @@ class Map:
                 self.enemy_mov.append(False)
             self.border1.append(int(linha[3]))
             self.border2.append(int(linha[4]))
+        f.readline()
+        number_checkpoints = int(f.readline())
+        for i in range (number_checkpoints):
+            linha = f.readline().split(",")
+            self.checkpointx.append(int(linha[0]))
+            self.checkpointy.append(int(linha[1]))
 
     def parseInput(self, f):
         for line in f:
