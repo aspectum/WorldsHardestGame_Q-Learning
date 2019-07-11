@@ -46,6 +46,7 @@ class Game:
         self.max_iterations = 9999
         self.iter_state = []
         self.colision = True
+        self.checkpoints = False
 
         # attributes for Q-Learning with incremental learning
         self.learn = QLearning(self)

@@ -22,9 +22,12 @@ class Map:
         self.number_checks = 0
         self.checkpointx = []
         self.checkpointy = []
+        self.checkpoints = []
 
         self.readFile(level)
         self.drawMap(level)
+        self.makeCheckpoints()
+        self.checkpoints.append(self.finish)
 
     def readFile(self, lvl):
 
@@ -56,7 +59,7 @@ class Map:
             self.border2.append(int(linha[4]))
         f.readline()
         number_checkpoints = int(f.readline())
-        for i in range (number_checkpoints):
+        for i in range(number_checkpoints):
             linha = f.readline().split(",")
             self.checkpointx.append(int(linha[0]))
             self.checkpointy.append(int(linha[1]))
@@ -134,3 +137,8 @@ class Map:
         rec = rect(tl, br)
 
         return rec
+
+    def makeCheckpoints(self):
+        for i in range(len(self.checkpointx)):
+            c = rect((self.checkpointx[i] - 5, self.checkpointy[i] - 5), (self.checkpointx[i] + 5, self.checkpointy[i] + 5))
+            self.checkpoints.append(c)

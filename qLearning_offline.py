@@ -15,6 +15,8 @@ class QLearning_offline:
 
         self.q_value_table = self.mult_dim_dict(2, QValues_offline, self)
 
+        self.active_checkpoint = 0
+
     def mult_dim_dict(self, dim, dict_type, params):
         if dim == 1:
             return defaultdict(lambda: dict_type(params))
@@ -56,8 +58,9 @@ class QValues_offline:
 
     def update_value(self):
 
-        # dist_finish = self.QL.dist2(self.QL.game.map.finish, self.pl.rec)
-        reward = -300
+        dist = self.QL.dist2(self.QL.game.map.checkpoints[self.QL.active_checkpoint], self.pl.rec)
+
+        reward = 10000 / (dist + 1)
         best_reward, _ = self.find_max_reward()
 
         self.val += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val)
@@ -69,7 +72,14 @@ class QValues_offline:
         self.val -= 1000
 
     def update_game_won(self):
-        self.val += 100000 / self.QL.game.pl.mov_num
+        # self.val += 100000 / self.QL.game.pl.mov_num
+        self.val += 10000
+
+    def update_checkpoint(self):
+        self.val = 250
+        if self.QL.active_checkpoint + 1 < len(self.QL.game.map.checkpoints):
+            self.QL.eps = 0.3
+            self.QL.active_checkpoint += 1
 
     def get_val_at_t(self, mov):
         return self.val
