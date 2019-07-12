@@ -4,7 +4,7 @@ import sys
 import pickle
 import os
 
-game = Game(level=0, watch=True, watch_periodic=False, replay=False)
+game = Game(level=5, watch=True, watch_periodic=False, replay=False)
 game.watcher_clock_flag = True
 
 if len(sys.argv) > 1:

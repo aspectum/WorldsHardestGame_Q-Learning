@@ -1,4 +1,5 @@
 import pickle
+import sys
 
 from player import Player
 from enemy import EnemyCircle
@@ -59,12 +60,19 @@ class Game:
 
     # main game functions
     def start(self):
+        self.createEnv()
         if self.colision:
             temp.load_online(self)
+            # print(self.learn.q_value_table[500][575].init_val)
+            # print(self.learn.q_value_table[500][570].init_val)
+            # print(self.learn.q_value_table[500][565].init_val)
+            # print(self.learn.q_value_table[500][560].init_val)
+            # print(self.learn.q_value_table[500][580].init_val)
+            # sys.exit()
         else:
             self.learn = self.learn_offline
         # draw player, enemies and map
-        self.createEnv()
+        # self.createEnv()
         if self.watch or self.watch_periodic:
             self.w = watcher(self, self.watcher_clock_flag)
         self.game_loop()

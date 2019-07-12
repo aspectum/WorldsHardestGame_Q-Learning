@@ -15,7 +15,7 @@ def save_offline(obj, intermediate):
         for i in obj.learn.q_value_table:
             for j in obj.learn.q_value_table[i]:
                 value = obj.learn.q_value_table[i][j].get_val_at_t(0)
-                line = str(i) + ', ' + str(j) + ', ' + str(value) + '\n'
+                line = str(i) + ',' + str(j) + ',' + str(value) + ',\n'
                 f.write(line)
 
 
@@ -25,8 +25,8 @@ def load_online(obj):
     with open('offline_learn.txt', 'r') as f:
         for line in f:
             words = line.split(',')
-            x = words[0]
-            y = words[1]
-            value = words[2]
+            x = int(words[0])
+            y = int(words[1])
+            value = float(words[2])
             obj.learn_offline.q_value_table[x][y].val = value
             obj.learn.q_value_table[x][y].init_val = value

@@ -39,6 +39,7 @@ class Player:
         # intersection logic with borders
         for line in self.game.map.lines:
             if self.rec.collidesWith(line):
+                self.game.learn.q_value_table[self.rec.tl.x][self.rec.tl.y].update_wall_colision()
                 self.rec.move(self.move_dir[self.opposite_dir[d]])
                 self.game.learn.q_value_table[self.rec.tl.x][self.rec.tl.y].update_wall_colision()
 

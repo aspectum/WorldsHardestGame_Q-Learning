@@ -7,6 +7,7 @@
 
 import random
 from collections import defaultdict
+import sys
 
 dirs = ["right", "left", "up", "down", "stay"]
 
@@ -70,11 +71,11 @@ class QValues:
 
         # dist_finish = self.QL.dist2(self.QL.game.map.finish, self.pl.rec)
 
-        # reward = 10000000/(dist_finish + 1)
+        reward = -1  # 10000000/(dist_finish + 1)
 
         best_reward, _ = self.find_max_reward()
 
-        self.val[self.t.index(self.pl.mov_num)] += self.QL.lr * (self.QL.gamma * best_reward - self.val[self.t.index(self.pl.mov_num)])
+        self.val[self.t.index(self.pl.mov_num)] += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val[self.t.index(self.pl.mov_num)])
 
     def update_after_death(self):
         if self.pl.mov_num not in self.t:
@@ -109,6 +110,12 @@ class QValues:
         for d in dirs:
             x, y = self.pl.move_simulation(d)
             li.append(self.table[x][y].get_val_at_t(self.pl.mov_num + 1))
+        #     print()
+        #     print(d)
+        #     print(self.table[x][y].get_val_at_t(self.pl.mov_num + 1))
+
+        # print(self.QL.game.pl.rec.getPos())
+        # sys.exit()
 
         maxi = max(li)
 
@@ -117,4 +124,12 @@ class QValues:
     def find_best_move(self):
         maxi, li = self.find_max_reward()
 
-        return dirs[li.index(maxi)]
+        maxes = [i for i, x in enumerate(li) if x == maxi]
+
+        if len(maxes) > 1:
+            i = random.randint(0, len(maxes) - 1)
+            best_move = dirs[i]
+        else:
+            best_move = dirs[li.index(maxi)]
+    
+        return best_move

@@ -2,7 +2,7 @@ import random
 from collections import defaultdict
 import math
 
-dirs = ["up", "right", "left", "down", "stay"]
+dirs = ["right", "left", "up", "down", "stay"]
 
 
 class QLearning_offline:
@@ -61,11 +61,11 @@ class QValues_offline:
 
         # dist = self.QL.dist2(self.QL.game.map.checkpoints[self.QL.active_checkpoint], self.pl.rec)
 
-        # reward = 1 / math.sqrt(dist + 1)
+        reward = -1  # 1 / math.sqrt(dist + 1)
         best_reward, _ = self.find_max_reward()
 
-        # self.val += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val)
-        self.val += self.QL.lr * (self.QL.gamma * best_reward - self.val)
+        self.val += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val)
+        # self.val += self.QL.lr * (self.QL.gamma * best_reward - self.val)
 
     def update_after_death(self):
         self.val -= 3000
@@ -89,6 +89,9 @@ class QValues_offline:
         for d in dirs:
             x, y = self.pl.move_simulation(d)
             li.append(self.table[x][y].get_val_at_t(self.pl.mov_num + 1))
+            # print()
+            # print(d)
+            # print(self.table[x][y].get_val_at_t(self.pl.mov_num + 1))
 
         maxi = max(li)
 
