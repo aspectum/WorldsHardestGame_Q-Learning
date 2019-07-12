@@ -10,7 +10,7 @@ class QLearning_offline:
         self.pl = game.pl
         self.game = game
 
-        self.eps = 0.8
+        self.eps = 0.2
         self.lr = 0.4
         self.gamma = 0.9
 
@@ -61,10 +61,10 @@ class QValues_offline:
 
         # dist = self.QL.dist2(self.QL.game.map.checkpoints[self.QL.active_checkpoint], self.pl.rec)
 
-        reward = -1  # 1 / math.sqrt(dist + 1)
+        reward = -0.1  # 1 / math.sqrt(dist + 1)
         best_reward, _ = self.find_max_reward()
 
-        self.val += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val)
+        self.val += self.QL.lr * (self.QL.gamma * best_reward - self.val)
         # self.val += self.QL.lr * (self.QL.gamma * best_reward - self.val)
 
     def update_after_death(self):
@@ -100,4 +100,12 @@ class QValues_offline:
     def find_best_move(self):
         maxi, li = self.find_max_reward()
 
-        return dirs[li.index(maxi)]
+        maxes = [i for i, x in enumerate(li) if x == maxi]
+
+        if len(maxes) > 1:
+            i = random.randint(0, len(maxes) - 1)
+            best_move = dirs[i]
+        else:
+            best_move = dirs[li.index(maxi)]
+    
+        return best_move

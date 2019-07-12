@@ -43,6 +43,11 @@ class Player:
                 self.rec.move(self.move_dir[self.opposite_dir[d]])
                 self.game.learn.q_value_table[self.rec.tl.x][self.rec.tl.y].update_wall_colision()
 
+        for e in self.game.enemies:
+            if self.rec.collidesWith(e.rec) and self.game.colision:
+                self.game.gameContinues = False
+                self.game.learn.q_value_table[self.rec.tl.x][self.rec.tl.y].update_after_death()
+
         # Checkpoints
         if self.game.checkpoints:
             for i, c in enumerate(self.game.map.checkpoints):

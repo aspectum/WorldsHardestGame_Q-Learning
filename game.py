@@ -51,6 +51,9 @@ class Game:
         self.constant_eps = False
         self.replay_file_only = False
 
+        self.epochs = 0
+        self.qsz = 0
+
         # attributes for Q-Learning with incremental learning
         self.learn = QLearning(self)
         self.learn_offline = QLearning_offline(self)
@@ -126,8 +129,8 @@ class Game:
                     self.save_state()
 
             # Probably can wrap this in a print state/status method
-            if self.iter_num % self.iteration_print_interval == 0:
-                self.print_status()
+            
+            self.print_status()
             self.endGame()
 
             if self.iter_num > self.max_iterations:
@@ -158,18 +161,15 @@ class Game:
         # self.map.drawMap(level)
 
     def print_status(self):
-        print('Iteration: ', self.iter_num)
         qsz = 0
         if self.colision:
             for i in self.learn.q_value_table:
                 for j in self.learn.q_value_table[i]:
                     qsz += len(self.learn.q_value_table[i][j].t)
-        # else:
-        #    for i in self.learn_offline.q_value_table:
-        #       for j in self.learn_offline.q_value_table[i]:
-                # qsz += len(self.learn_offline.q_value_table[i][j])
-
-        print('Q-Table size: ', qsz)
+        self.qsz = qsz
+        if self.iter_num % self.iteration_print_interval == 0:
+            print('Iteration: ', self.iter_num)
+            print('Q-Table size: ', qsz)
 
     def save_state(self):
         player = self.pl.rec.getPos()
@@ -191,12 +191,17 @@ class Game:
             print("Win after %d iterations" % self.iter_num)
             print("Max moves: ", self.player_max_moves)
             print("Moves used: ", self.pl.mov_num)
-            if not self.colision:
+            self.epochs = self.iter_num
+            if self.colision:
+                temp.save_online(self)
+                replay_fname = 'resultado/replay.p'
+            else:
+                replay_fname = 'resultado/replay_offline.p'
                 temp.save_offline(self, True)
                 self.isWin = False
                 self.gameContinues = True
             if self.replay:
-                with open('replay.p', 'wb') as f:
+                with open(replay_fname, 'wb') as f:
                     pickle.dump(self.iter_state, f)
                 if not self.replay_file_only:
                     self.w = watcher(self, self.watcher_clock_flag)
