@@ -112,3 +112,5 @@ venv.bak/
 .flake8
 replay.p
 offline_learn.txt
+qtables
+qtables/*

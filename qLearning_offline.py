@@ -2,7 +2,7 @@ import random
 from collections import defaultdict
 import math
 
-dirs = ["right", "left", "up", "down", "stay"]
+dirs = ["up", "right", "left", "down", "stay"]
 
 
 class QLearning_offline:
