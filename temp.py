@@ -1,11 +1,14 @@
 # To save after trained offline
 import time
 from qLearning_offline import QLearning_offline
+import os
 
 
 def save_offline(obj, intermediate):
     if intermediate:
-        filename = 'offline_learn_{}.txt'.format(int(time.time()))
+        if not os.path.isdir('qtables'):
+            os.makedirs('qtables')
+        filename = os.path.join('qtables', 'offline_learn_{}.txt'.format(int(time.time())))
     else:
         filename = 'offline_learn.txt'
     with open(filename, 'w') as f:
