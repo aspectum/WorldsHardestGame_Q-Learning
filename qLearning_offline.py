@@ -61,10 +61,10 @@ class QValues_offline:
 
         # dist = self.QL.dist2(self.QL.game.map.checkpoints[self.QL.active_checkpoint], self.pl.rec)
 
-        reward = -0.1  # 1 / math.sqrt(dist + 1)
+        reward = -1  # 1 / math.sqrt(dist + 1)
         best_reward, _ = self.find_max_reward()
 
-        self.val += self.QL.lr * (self.QL.gamma * best_reward - self.val)
+        self.val += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val)
         # self.val += self.QL.lr * (self.QL.gamma * best_reward - self.val)
 
     def update_after_death(self):
