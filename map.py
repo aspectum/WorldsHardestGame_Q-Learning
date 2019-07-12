@@ -125,6 +125,8 @@ class Map:
             line = rect(tl, br)
         else:   # Diagonal, shouldn't happen
             print("ERROR: Level shouldn't have diagonal lines!")
+            print(start)
+            print(finish)
             sys.exit()
 
         return line

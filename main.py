@@ -3,37 +3,37 @@ import time
 
 start = time.time()
 
-game = Game(level=5, watch=False, watch_periodic=False, replay=True)
+game = Game(level=2, watch=False, watch_periodic=False, replay=True)
 # watch overrides watch_periodic
 
 # General parameters
 game.player_max_moves = 200
-game.player_max_max_moves = 3000
-game.player_vel = 1
+game.player_max_max_moves = 1000
+game.player_vel = 5
 game.player_moves_step = 10
-game.player_moves_interval = 20
-game.eps_decrease_interval = 500
+game.player_moves_interval = 50
+game.eps_decrease_interval = 100
 game.iteration_print_interval = 100
-game.max_iterations = 10000
+game.max_iterations = 5000
 
 # Q-Learning parameters
-game.learn_offline.eps = 0.81
-game.learn_offline.lr = 0.3
-game.learn_offline.gamma = 0.8
+# game.learn_offline.eps = 0.15
+# game.learn_offline.lr = 0.4
+# game.learn_offline.gamma = 0.9
 
-# game.learn.eps = 0.2
-# game.learn.lr = 0.4
-# game.learn.gamma = 0.8
+game.learn.eps = 0.2
+game.learn.lr = 0.4
+game.learn.gamma = 0.8
 
 # Watcher parameters
-game.watcher_clock_flag = False
+game.watcher_clock_flag = True
 game.watch_period = 1000
 game.watch_duration = 1
 
 # Colision On/Off
-game.colision = False
+game.colision = True
 game.checkpoints = False
-game.constant_eps = False
+game.constant_eps = True
 
 game.replay_file_only = True
 
