@@ -17,7 +17,7 @@ game.iteration_print_interval = 50
 game.max_iterations = 10000
 
 # Q-Learning parameters
-game.learn_offline.eps = 0.8
+game.learn_offline.eps = 0.2
 game.learn_offline.lr = 0.4
 game.learn_offline.gamma = 0.8
 
@@ -28,7 +28,8 @@ game.watch_duration = 1
 
 # Colision On/Off
 game.colision = False
-game.checkpoints = True
+game.checkpoints = False
+game.constant_eps = True
 
 game.start()
 
