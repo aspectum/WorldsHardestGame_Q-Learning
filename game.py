@@ -87,6 +87,11 @@ class Game:
         while not self.isWin:
             del self.iter_state[:]
             self.iter_state = []
+            self.iter_state.append(self.level)
+            if self.colision:
+                self.iter_state.append(1)
+            else:
+                self.iter_state.append(0)
             self.iter_state.append(self.iter_num)
             self.iter_state.append(self.player_max_moves)
             if self.watch:

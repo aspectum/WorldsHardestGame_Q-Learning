@@ -7,7 +7,7 @@ class watcher:
     black = 0, 0, 0
     white = 255, 255, 255
 
-    def __init__(self, game, clock_flag=False):
+    def __init__(self, game, fps=60, clock_flag=True):
         self.game = game
         self.sc = None
         self.createScreen(1000, 1000)
@@ -21,7 +21,7 @@ class watcher:
 
         self.clock_flag = clock_flag
 
-        self.tick_freq = 30
+        self.tick_freq = fps
         self.clock = pygame.time.Clock()
 
         # self.updateMap()
@@ -81,21 +81,23 @@ class watcher:
                 sys.exit()
 
     def replay(self, state):
-        iter_num = state[0]
-        max_moves = state[1]
+        iter_num = state[2]
+        max_moves = state[3]
 
         self.lbl_iter_num = self.myfont.render("Iter number: " + str(iter_num), 1, watcher.black)
         self.lbl_max_moves = self.myfont.render("Max moves: " + str(max_moves),
                                                 1, watcher.black)
 
-        for i in range(2, len(state)):
+        for i in range(4, len(state)):
             self.check_input()
             self.sc.fill(watcher.white)
 
             tl = state[i][0]
             self.sc.blit(self.player_im, tl)
-            for e in state[i][1]:
-                self.sc.blit(self.enemy_im, e)
+
+            if state[1] == 1:
+                for e in state[i][1]:
+                    self.sc.blit(self.enemy_im, e)
 
             self.drawMap()
 
