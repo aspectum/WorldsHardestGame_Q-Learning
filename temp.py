@@ -1,9 +1,14 @@
 # To save after trained offline
+import time
 from qLearning_offline import QLearning_offline
 
 
-def save_offline(obj):
-    with open('offline_learn.txt', 'w') as f:
+def save_offline(obj, intermediate):
+    if intermediate:
+        filename = 'offline_learn_{}.txt'.format(int(time.time()))
+    else:
+        filename = 'offline_learn.txt'
+    with open(filename, 'w') as f:
         for i in obj.learn.q_value_table:
             for j in obj.learn.q_value_table[i]:
                 value = obj.learn.q_value_table[i][j].get_val_at_t(0)

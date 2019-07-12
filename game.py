@@ -68,7 +68,7 @@ class Game:
             self.w = watcher(self, self.watcher_clock_flag)
         self.game_loop()
         if not self.colision:
-            temp.save_offline(self)
+            temp.save_offline(self, False)
 
     def game_loop(self):
         n = 1
@@ -178,7 +178,7 @@ class Game:
             print("Max moves: ", self.player_max_moves)
             print("Moves used: ", self.pl.mov_num)
             if not self.colision:
-                # temp.save_offline(self)
+                temp.save_offline(self, True)
                 self.isWin = False
                 self.gameContinues = True
             if self.replay:
