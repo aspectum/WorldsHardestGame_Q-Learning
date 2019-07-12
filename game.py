@@ -48,6 +48,7 @@ class Game:
         self.colision = True
         self.checkpoints = False
         self.constant_eps = False
+        self.replay_file_only = False
 
         # attributes for Q-Learning with incremental learning
         self.learn = QLearning(self)
@@ -184,9 +185,10 @@ class Game:
             if self.replay:
                 with open('replay.p', 'wb') as f:
                     pickle.dump(self.iter_state, f)
-                self.w = watcher(self, self.watcher_clock_flag)
-                input('Press ENTER to start replay')
-                self.w.replay(self.iter_state)
+                if not self.replay_file_only:
+                    self.w = watcher(self, self.watcher_clock_flag)
+                    input('Press ENTER to start replay')
+                    self.w.replay(self.iter_state)
         else:
             if self.iter_num % self.player_moves_interval == 0:
                 if self.player_max_moves < self.player_max_max_moves:

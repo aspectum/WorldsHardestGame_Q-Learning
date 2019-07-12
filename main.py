@@ -31,6 +31,8 @@ game.colision = False
 game.checkpoints = False
 game.constant_eps = True
 
+game.replay_file_only = True
+
 game.start()
 
 finish = time.time()
