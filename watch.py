@@ -7,7 +7,7 @@ class watcher:
     black = 0, 0, 0
     white = 255, 255, 255
 
-    def __init__(self, game, fps=60, clock_flag=True):
+    def __init__(self, game, fps=30, clock_flag=True):
         self.game = game
         self.sc = None
         self.createScreen(1000, 1000)
