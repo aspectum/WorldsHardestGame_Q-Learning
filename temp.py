@@ -1,6 +1,6 @@
 # To save after trained offline
 import time
-from qLearning_offline import QLearning_offline
+from qLearning import QLearning
 import os
 from shutil import copyfile
 
@@ -24,7 +24,7 @@ def save_offline(obj, intermediate):
 
 # To load to train online (use this values as ininial)
 def load_online(obj):
-    obj.learn_offline_initial_conditions = QLearning_offline(obj)
+    obj.learn_offline_initial_conditions = QLearning(obj, online=False)
     with open('offline_learn.txt', 'r') as f:
         f.readline()
         for line in f:
@@ -32,7 +32,7 @@ def load_online(obj):
             x = int(words[0])
             y = int(words[1])
             value = float(words[2])
-            obj.learn_offline.q_value_table[x][y].val = value
+            obj.learn_offline_initial_conditions.q_value_table[x][y].val = value
             obj.learn.q_value_table[x][y].init_val = value
 
 

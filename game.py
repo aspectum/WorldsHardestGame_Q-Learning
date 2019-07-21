@@ -4,7 +4,7 @@ import sys
 from player import Player
 from enemy import EnemyCircle
 from qLearning import QLearning
-from qLearning_offline import QLearning_offline
+# from qLearning import QLearning_offline
 import temp
 from map import Map
 from watch import watcher
@@ -12,7 +12,7 @@ from watch import watcher
 
 class Game:
 
-    def __init__(self, level=0, watch=False, watch_periodic=False, replay=False):
+    def __init__(self, level=0, watch=False, watch_periodic=False, replay=False, colision=True):
         # To show the game
         self.watch = watch
         self.watch_periodic = watch_periodic
@@ -46,7 +46,7 @@ class Game:
         self.iteration_print_interval = 10
         self.max_iterations = 9999
         self.iter_state = []
-        self.colision = True
+        self.colision = colision
         self.checkpoints = False
         self.constant_eps = False
         self.replay_file_only = False
@@ -54,30 +54,21 @@ class Game:
         self.epochs = 0
         self.qsz = 0
 
+        # draw player, enemies and map
+        self.createEnv()
+        
         # attributes for Q-Learning with incremental learning
-        self.learn = QLearning(self)
-        self.learn_offline = QLearning_offline(self)
-
-        # if not self.colision:
-        #     self.learn = self.learn_offline
+        self.learn = QLearning(self, online=colision)
 
     # main game functions
     def start(self):
-        self.createEnv()
-        if self.colision:
-            temp.load_online(self)
-            # print(self.learn.q_value_table[500][575].init_val)
-            # print(self.learn.q_value_table[500][570].init_val)
-            # print(self.learn.q_value_table[500][565].init_val)
-            # print(self.learn.q_value_table[500][560].init_val)
-            # print(self.learn.q_value_table[500][580].init_val)
-            # sys.exit()
-        else:
-            self.learn = self.learn_offline
         # draw player, enemies and map
         # self.createEnv()
+        if self.colision:
+            temp.load_online(self)
+        
         if self.watch or self.watch_periodic:
-            self.w = watcher(self, self.watcher_clock_flag)
+            self.w = watcher(self, clock_flag=self.watcher_clock_flag)
         self.game_loop()
         if not self.colision:
             temp.save_offline(self, False)
@@ -118,12 +109,7 @@ class Game:
             while self.gameContinues:
                 if watch_enable:
                     self.w.updateMap()
-                # a = input()
                 self.learn.find_move()
-                # if self.colision:
-                #     self.learn.find_move()
-                # else:
-                #     self.learn_offline.find_move()
                 self.updateMap(self.level)
                 if self.replay:
                     self.save_state()
@@ -146,19 +132,15 @@ class Game:
                                           self.map.border1[i], self.map.border2[i])
 
     def init_positions(self):
-
-        # self.pl.set_pos(self.map.start_x, self.map.start_y)
         self.pl.rec.moveTo((self.map.start_x, self.map.start_y))
 
         for i in range(len(self.enemies)):
-            # self.enemies[i].set_pos(self.map.posx[i], self.map.posy[i])
             self.enemies[i].rec.moveTo((self.map.posx[i], self.map.posy[i]))
 
     def updateMap(self, level):
         for e in self.enemies:
             e.move()
 
-        # self.map.drawMap(level)
 
     def print_status(self):
         qsz = 0
@@ -204,7 +186,7 @@ class Game:
                 with open(replay_fname, 'wb') as f:
                     pickle.dump(self.iter_state, f)
                 if not self.replay_file_only:
-                    self.w = watcher(self, self.watcher_clock_flag)
+                    self.w = watcher(self, clock_flag=self.watcher_clock_flag)
                     input('Press ENTER to start replay')
                     self.w.replay(self.iter_state)
         else:
@@ -215,8 +197,6 @@ class Game:
             if (not self.constant_eps) and (self.iter_num % self.eps_decrease_interval == 0):
                 if self.learn.eps > 0.2:
                     self.learn.eps /= 2
-                # if self.learn_offline.eps > 0.2:
-                #     self.learn.eps /= 2
 
             # restart the game
 

@@ -1,19 +1,12 @@
-# TO-DO
-# - Change data structure for q-table in order to be able to save it (pickle, dump)
-# - Improve variable names for clarity
-# - Remove unused variables
-# - Of course, improve the q-learning algorithm and parameters as well
-########################################################################
-
 import random
 from collections import defaultdict
-import sys
 
 dirs = ["right", "left", "up", "down", "stay"]
 
 
+# Q-table and helper methods
 class QLearning:
-    def __init__(self, game):
+    def __init__(self, game, online=True):
         self.pl = game.pl
         self.game = game
 
@@ -21,16 +14,16 @@ class QLearning:
         self.lr = 0.4
         self.gamma = 0.9
 
-        self.q_value_table = self.mult_dim_dict(2, QValues, self)
+        if online:
+            self.q_value_table = self.mult_dim_dict(2, QValues, self)
+        else:
+            self.q_value_table = self.mult_dim_dict(2, QValues_offline, self)
 
     def mult_dim_dict(self, dim, dict_type, params):
         if dim == 1:
             return defaultdict(lambda: dict_type(params))
         else:
             return defaultdict(lambda: self.mult_dim_dict(dim - 1, dict_type, params))
-
-    def dist2(self, obj1, obj2):
-        return (obj1.tl.x - obj2.tl.x)**2 + (obj1.tl.y - obj2.tl.y)**2
 
     def find_move(self):
         r = random.random()
@@ -50,7 +43,31 @@ class QLearning:
     def move_optimally(self):
         x, y = self.game.pl.rec.tl.x, self.game.pl.rec.tl.y
 
-        self.game.pl.move(self.q_value_table[x][y].find_best_move())
+        self.game.pl.move(self.find_best_move())
+
+    def find_max_reward(self):
+        li = []
+
+        for d in dirs:
+            x, y = self.pl.move_simulation(d)
+            li.append(self.q_value_table[x][y].get_val_at_t(self.pl.mov_num + 1))
+
+        maxi = max(li)
+
+        return maxi, li
+
+    def find_best_move(self):
+        maxi, li = self.find_max_reward()
+
+        maxes = [i for i, x in enumerate(li) if x == maxi]
+
+        if len(maxes) > 1:
+            i = random.randint(0, len(maxes) - 1)
+            best_move = dirs[i]
+        else:
+            best_move = dirs[li.index(maxi)]
+
+        return best_move
 
 
 class QValues:
@@ -60,7 +77,7 @@ class QValues:
         self.table = self.QL.q_value_table
         self.pl = self.QL.game.pl
         self.val = []
-        self.t = []  # time
+        self.t = []  # 'time' (more like tick number or iteration) - representing 'board state' (i.e. enemy positions) with a single value
         self.init_val = 0
 
     def update_value(self):
@@ -69,11 +86,9 @@ class QValues:
             self.t.append(self.pl.mov_num)
             self.val.append(self.init_val)
 
-        # dist_finish = self.QL.dist2(self.QL.game.map.finish, self.pl.rec)
+        # reward = -1
 
-        reward = -1  # 10000000/(dist_finish + 1)
-
-        best_reward, _ = self.find_max_reward()
+        best_reward, _ = self.QL.find_max_reward()
 
         self.val[self.t.index(self.pl.mov_num)] += self.QL.lr * (self.QL.gamma * best_reward - self.val[self.t.index(self.pl.mov_num)])
 
@@ -104,32 +119,28 @@ class QValues:
         else:
             return self.init_val
 
-    def find_max_reward(self):
-        li = []
 
-        for d in dirs:
-            x, y = self.pl.move_simulation(d)
-            li.append(self.table[x][y].get_val_at_t(self.pl.mov_num + 1))
-        #     print()
-        #     print(d)
-        #     print(self.table[x][y].get_val_at_t(self.pl.mov_num + 1))
+class QValues_offline:
+    def __init__(self, QLearning):
 
-        # print(self.QL.game.pl.rec.getPos())
-        # sys.exit()
+        self.QL = QLearning
+        self.table = self.QL.q_value_table
+        self.val = 0  # single value (no enemies -> no different board states for same position)
 
-        maxi = max(li)
+    def update_value(self):
+        reward = -1
+        best_reward, _ = self.QL.find_max_reward()
 
-        return maxi, li
+        self.val += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val)
 
-    def find_best_move(self):
-        maxi, li = self.find_max_reward()
+    def update_after_death(self):
+        self.val -= 3000
 
-        maxes = [i for i, x in enumerate(li) if x == maxi]
+    def update_wall_colision(self):
+        self.val -= 1000
 
-        if len(maxes) > 1:
-            i = random.randint(0, len(maxes) - 1)
-            best_move = dirs[i]
-        else:
-            best_move = dirs[li.index(maxi)]
-    
-        return best_move
+    def update_game_won(self):
+        self.val += 100000 / self.QL.game.pl.mov_num
+
+    def get_val_at_t(self, mov):
+        return self.val
