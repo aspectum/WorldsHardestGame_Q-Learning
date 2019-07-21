@@ -48,12 +48,6 @@ class Player:
                 self.game.gameContinues = False
                 self.game.learn.q_value_table[self.rec.tl.x][self.rec.tl.y].update_after_death()
 
-        # Checkpoints
-        if self.game.checkpoints:
-            for i, c in enumerate(self.game.map.checkpoints):
-                if self.rec.collidesWith(c):
-                    self.game.learn.q_value_table[self.rec.tl.x][self.rec.tl.y].update_checkpoint()
-
     def move_simulation(self, d):
         return (self.rec.tl.x + self.move_dir[d][0], self.rec.tl.y + self.move_dir[d][1])
 
