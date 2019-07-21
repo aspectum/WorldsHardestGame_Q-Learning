@@ -1,7 +1,7 @@
 import random
 from collections import defaultdict
 
-dirs = ["right", "left", "up", "down", "stay"]
+MOVES = ["right", "left", "up", "down", "stay"]  # Possible moves
 
 
 # Q-table and helper methods
@@ -10,9 +10,9 @@ class QLearning:
         self.pl = game.pl
         self.game = game
 
-        self.eps = 0.2
-        self.lr = 0.4
-        self.gamma = 0.9
+        self.eps = 0.2      # Random action chance
+        self.lr = 0.4       # Learning rate
+        self.gamma = 0.9    # Future rewards multiplicator (discount)
 
         if online:
             self.q_value_table = self.mult_dim_dict(2, QValues, self)
@@ -27,45 +27,37 @@ class QLearning:
 
     def find_move(self):
         r = random.random()
-
         if r < self.eps:
             self.move_randomly()
         else:
             self.move_optimally()
-
         x, y = self.game.pl.rec.tl.x, self.game.pl.rec.tl.y
         self.q_value_table[x][y].update_value()
 
     def move_randomly(self):
-        i = random.randint(0, len(dirs) - 1)
-        self.game.pl.move(dirs[i])
+        i = random.randint(0, len(MOVES) - 1)
+        self.game.pl.move(MOVES[i])
 
     def move_optimally(self):
-        x, y = self.game.pl.rec.tl.x, self.game.pl.rec.tl.y
-
         self.game.pl.move(self.find_best_move())
 
     def find_max_reward(self):
         li = []
-
-        for d in dirs:
-            x, y = self.pl.move_simulation(d)
+        for m in MOVES:
+            x, y = self.pl.move_simulation(m)
             li.append(self.q_value_table[x][y].get_val_at_t(self.pl.mov_num + 1))
-
         maxi = max(li)
 
         return maxi, li
 
     def find_best_move(self):
         maxi, li = self.find_max_reward()
-
         maxes = [i for i, x in enumerate(li) if x == maxi]
-
-        if len(maxes) > 1:
+        if len(maxes) > 1:  # Between equally good moves, choose randomly
             i = random.randint(0, len(maxes) - 1)
-            best_move = dirs[i]
+            best_move = MOVES[i]
         else:
-            best_move = dirs[li.index(maxi)]
+            best_move = MOVES[li.index(maxi)]
 
         return best_move
 
@@ -75,10 +67,11 @@ class QValues:
 
         self.QL = QLearning
         self.table = self.QL.q_value_table
+
         self.pl = self.QL.game.pl
-        self.val = []
-        self.t = []  # 'time' (more like tick number or iteration) - representing 'board state' (i.e. enemy positions) with a single value
-        self.init_val = 0
+        self.val = []       # values in each 'time' (self.t)
+        self.t = []         # 'time' (more like tick number or iteration) - representing 'board state' (i.e. enemy positions) with a single value
+        self.init_val = 0   # initial value
 
     def update_value(self):
 
@@ -86,10 +79,11 @@ class QValues:
             self.t.append(self.pl.mov_num)
             self.val.append(self.init_val)
 
-        # reward = -1
+        # reward = -1  #  Not using this reward in online mode
 
         best_reward, _ = self.QL.find_max_reward()
 
+        # Classic Q-Learning learning formula
         self.val[self.t.index(self.pl.mov_num)] += self.QL.lr * (self.QL.gamma * best_reward - self.val[self.t.index(self.pl.mov_num)])
 
     def update_after_death(self):
@@ -125,10 +119,11 @@ class QValues_offline:
 
         self.QL = QLearning
         self.table = self.QL.q_value_table
+
         self.val = 0  # single value (no enemies -> no different board states for same position)
 
     def update_value(self):
-        reward = -1
+        reward = -1  # If player keeps going to same places, this starts to add up, so motivates it to explore
         best_reward, _ = self.QL.find_max_reward()
 
         self.val += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val)
