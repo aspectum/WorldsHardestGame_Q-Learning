@@ -2,6 +2,7 @@ import random
 from collections import defaultdict
 import time
 import os
+# from shutil import copyfile
 
 MOVES = ["right", "left", "up", "down", "stay"]  # Possible moves
 
@@ -157,7 +158,7 @@ def save_offline(obj, intermediate):
                 value = obj.learn.q_value_table[i][j].get_val_at_t(0)
                 line = str(i) + ',' + str(j) + ',' + str(value) + ',\n'
                 f.write(line)
-    # copyfile('offline_learn.txt', 'resultado/offline_learn.txt')
+    # copyfile('offline_learn.txt', 'result/offline_learn.txt')
 
 
 # To load to train online (use this values as ininial)

@@ -1,5 +1,5 @@
 from game import Game
-from watch import watcher
+from watch import Watcher
 import sys
 import pickle
 import os
@@ -16,8 +16,9 @@ if not os.path.isfile(filename):
 with open(filename, 'rb') as f:
     final_state = pickle.load(f)
 
-game = Game(level=final_state[0], watch=True, watch_periodic=False, replay=False)
+w = Watcher(fps=int(sys.argv[1]), clock_flag=True)
+
+game = Game(level=final_state[0], watcher=w)
 game.watcher_clock_flag = True
 
-w = watcher(game, clock_flag=game.watcher_clock_flag, fps=int(sys.argv[1]))
 w.replay(final_state)

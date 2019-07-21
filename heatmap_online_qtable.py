@@ -1,17 +1,16 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import time
 import os
 import math
 
-if not os.path.isdir('resultado/online_heatmap'):
-    os.makedirs('resultado/online_heatmap')
+if not os.path.isdir('result/online_heatmap'):
+    os.makedirs('result/online_heatmap')
 
 xs = []
 ys = []
 V = []
 T = []
-with open('resultado/online_learn.txt', 'r') as f:
+with open('result/online_learn.txt', 'r') as f:
     step = int(f.readline())
     for line in f:
         words = line.split(',')
@@ -19,7 +18,7 @@ with open('resultado/online_learn.txt', 'r') as f:
         ys.append(int(words[1]))
         times = []
         vals = []
-        for i in range(2, len(words)-1):
+        for i in range(2, len(words) - 1):
             if i % 2 == 0:
                 times.append(int(words[i]))
             else:
@@ -33,7 +32,6 @@ ymax = max(ys)
 xmin = min(xs)
 xmax = max(xs)
 
-# vmin = min(vals)
 flat_time = [item for sublist in T for item in sublist]
 tmax = max(flat_time)
 
@@ -61,7 +59,7 @@ for i in range(m.shape[2]):
     cbar.draw_all()
     # plt.show()
     img = plt.gcf()
-    img.savefig('resultado/online_heatmap/im_%04d.png' % i, bbox_inches='tight')
+    img.savefig('result/online_heatmap/im_%04d.png' % i, bbox_inches='tight')
     plt.clf()
 
 # from glob import glob

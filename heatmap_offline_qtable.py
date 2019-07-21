@@ -5,7 +5,7 @@ import math
 xs = []
 ys = []
 vals = []
-with open('resultado/offline_learn.txt', 'r') as f:
+with open('result/offline_learn.txt', 'r') as f:
     step = int(f.readline())
     for line in f:
         words = line.split(',')
@@ -22,8 +22,8 @@ xmax = max(xs)
 vmin = min(vals)
 vmax = max(vals)
 
-w = int((ymax - ymin) / step) + 1  # 10,5,1 +-1
-h = int((xmax - xmin) / step) + 1  # 10,5,1 +-1
+w = int((ymax - ymin) / step) + 1
+h = int((xmax - xmin) / step) + 1
 
 m = np.zeros((w, h))
 
@@ -39,4 +39,4 @@ fig = plt.imshow(m, cmap='hot')
 cbar = plt.colorbar(fig)
 cbar.draw_all()
 img = plt.gcf()
-img.savefig('resultado/offline_heatmap.png', bbox_inches='tight')
+img.savefig('result/offline_heatmap.png', bbox_inches='tight')
