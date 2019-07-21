@@ -1,25 +1,23 @@
 import pickle
-import sys
 
 from player import Player
 from enemy import EnemyCircle
 from qLearning import QLearning
-# from qLearning import QLearning_offline
 import temp
 from map import Map
-from watch import watcher
 
 
 class Game:
 
-    def __init__(self, level=0, watch=False, watch_periodic=False, replay=False, colision=True):
+    def __init__(self, level=0, watcher=None, colision=True):
         # To show the game
-        self.watch = watch
-        self.watch_periodic = watch_periodic
-        self.replay = replay
-        self.watcher_clock_flag = False
-        self.watch_period = 50
-        self.watch_duration = 10
+        self.watcher = watcher
+        self.watch = None
+        self.show_replay = None
+        if self.watcher is not None:
+            self.watcher.linkToGame(self)
+            self.watch = self.watcher.watch_all or self.watcher.watch_periodic
+            self.show_replay = self.watcher.show_replay
 
         # game info
         self.gameContinues = True
@@ -56,7 +54,7 @@ class Game:
 
         # draw player, enemies and map
         self.createEnv()
-        
+
         # attributes for Q-Learning with incremental learning
         self.learn = QLearning(self, online=colision)
 
@@ -66,17 +64,11 @@ class Game:
         # self.createEnv()
         if self.colision:
             temp.load_online(self)
-        
-        if self.watch or self.watch_periodic:
-            self.w = watcher(self, clock_flag=self.watcher_clock_flag)
         self.game_loop()
         if not self.colision:
             temp.save_offline(self, False)
 
     def game_loop(self):
-        n = 1
-        k = 0
-        watch_enable = False
 
         while not self.isWin:
             del self.iter_state[:]
@@ -88,18 +80,6 @@ class Game:
                 self.iter_state.append(0)
             self.iter_state.append(self.iter_num)
             self.iter_state.append(self.player_max_moves)
-            if self.watch:
-                watch_enable = True
-            elif self.watch_periodic:
-                if self.iter_num // (n * self.watch_period) > 0:
-                    watch_enable = True
-                    k += 1
-                    if k > self.watch_duration:
-                        watch_enable = False
-                        n += 1
-                        k = 0
-            else:
-                watch_enable = False
 
             self.init_positions()
             self.pl.mov_num = 0
@@ -107,15 +87,12 @@ class Game:
                 self.learn.active_checkpoint = 0
 
             while self.gameContinues:
-                if watch_enable:
-                    self.w.updateMap()
+                if self.shouldIWatch():
+                    self.watcher.updateMap()
                 self.learn.find_move()
                 self.updateMap(self.level)
-                if self.replay:
-                    self.save_state()
+                self.save_state()
 
-            # Probably can wrap this in a print state/status method
-            
             self.print_status()
             self.endGame()
 
@@ -128,7 +105,7 @@ class Game:
         self.pl = Player(self, self.player_vel)
 
         for i in range(len(self.enemies)):
-            self.enemies[i] = EnemyCircle(self, 2*self.player_vel, self.map.enemy_mov[i],
+            self.enemies[i] = EnemyCircle(self, 2 * self.player_vel, self.map.enemy_mov[i],
                                           self.map.border1[i], self.map.border2[i])
 
     def init_positions(self):
@@ -141,6 +118,15 @@ class Game:
         for e in self.enemies:
             e.move()
 
+    def shouldIWatch(self):
+        if self.watch:
+            if self.watcher.watch_all:
+                return True
+            elif self.watcher.watch_periodic:
+                if self.iter_num % self.watcher.period < self.watcher.duration:
+                    return True
+
+        return False
 
     def print_status(self):
         qsz = 0
@@ -182,13 +168,12 @@ class Game:
                 temp.save_offline(self, True)
                 self.isWin = False
                 self.gameContinues = True
-            if self.replay:
-                with open(replay_fname, 'wb') as f:
-                    pickle.dump(self.iter_state, f)
-                if not self.replay_file_only:
-                    self.w = watcher(self, clock_flag=self.watcher_clock_flag)
+            with open(replay_fname, 'wb') as f:
+                pickle.dump(self.iter_state, f)
+            if self.watcher is not None:
+                if self.watcher.show_replay:
                     input('Press ENTER to start replay')
-                    self.w.replay(self.iter_state)
+                    self.watcher.replay(self.iter_state)
         else:
             if self.iter_num % self.player_moves_interval == 0:
                 if self.player_max_moves < self.player_max_max_moves:
