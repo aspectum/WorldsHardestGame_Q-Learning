@@ -3,7 +3,7 @@ import pickle
 from player import Player
 from enemy import EnemyCircle
 from qLearning import QLearning
-import temp
+import qLearning
 from map import Map
 
 
@@ -58,33 +58,20 @@ class Game:
         # attributes for Q-Learning with incremental learning
         self.learn = QLearning(self, online=colision)
 
-    # main game functions
+    # Starting game
     def start(self):
-        # draw player, enemies and map
-        # self.createEnv()
         if self.colision:
-            temp.load_online(self)
+            qLearning.load_online(self)
         self.game_loop()
         if not self.colision:
-            temp.save_offline(self, False)
+            qLearning.save_offline(self, False)
 
     def game_loop(self):
 
         while not self.isWin:
-            del self.iter_state[:]
-            self.iter_state = []
-            self.iter_state.append(self.level)
-            if self.colision:
-                self.iter_state.append(1)
-            else:
-                self.iter_state.append(0)
-            self.iter_state.append(self.iter_num)
-            self.iter_state.append(self.player_max_moves)
-
+            self.restart_state()
             self.init_positions()
             self.pl.mov_num = 0
-            if self.checkpoints:
-                self.learn.active_checkpoint = 0
 
             while self.gameContinues:
                 if self.shouldIWatch():
@@ -139,6 +126,17 @@ class Game:
             print('Iteration: ', self.iter_num)
             print('Q-Table size: ', qsz)
 
+    def restart_state(self):
+        del self.iter_state[:]
+        self.iter_state = []
+        self.iter_state.append(self.level)
+        if self.colision:
+            self.iter_state.append(1)
+        else:
+            self.iter_state.append(0)
+        self.iter_state.append(self.iter_num)
+        self.iter_state.append(self.player_max_moves)
+
     def save_state(self):
         player = self.pl.rec.getPos()
 
@@ -161,11 +159,11 @@ class Game:
             print("Moves used: ", self.pl.mov_num)
             self.epochs = self.iter_num
             if self.colision:
-                temp.save_online(self)
-                replay_fname = 'resultado/replay.p'
+                qLearning.save_online(self)
+                replay_fname = 'result/replay.p'
             else:
-                replay_fname = 'resultado/replay_offline.p'
-                temp.save_offline(self, True)
+                replay_fname = 'result/replay_offline.p'
+                qLearning.save_offline(self, True)
                 self.isWin = False
                 self.gameContinues = True
             with open(replay_fname, 'wb') as f:

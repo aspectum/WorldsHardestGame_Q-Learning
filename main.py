@@ -4,15 +4,15 @@ from watch import Watcher
 import time
 import os
 
-if not os.path.isdir('resultado'):
-    os.makedirs('resultado')
+if not os.path.isdir('result'):
+    os.makedirs('result')
 
 start = time.time()
 
 col = True
 
 watcher = None
-watcher = Watcher(show='nothing', period=5, duration=2, replay=col, fps=30, clock_flag=True)
+# watcher = Watcher(show='nothing', period=5, duration=2, replay=col, fps=30, clock_flag=True)
 
 game = Game(level=0, watcher=watcher, colision=col)
 # watch overrides watch_periodic
@@ -55,9 +55,9 @@ finish = time.time()
 print('Execution time ', time.strftime('%H:%M:%S', time.gmtime(finish - start)))
 
 if game.colision:
-    filename = "resultado/params_online.txt"
+    filename = "result/params_online.txt"
 else:
-    filename = "resultado/params_offline.txt"
+    filename = "result/params_offline.txt"
 
 with open(filename, 'w') as f:
     f.write('game.player_max_moves = ' + str(game.player_max_moves) + '\n')
