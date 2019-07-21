@@ -11,15 +11,12 @@ class Watcher:
         self.game = None
         self.sc = None
         pygame.init()
-        # self.createScreen(1000, 1000)
+
         self.myfont = pygame.font.SysFont("monospace", 24)
         self.lbl_iter_num = None
         self.lbl_max_moves = None
-        # self.player_im = pygame.image.load("./img/player.jpg").convert()
-        # self.enemy_im = pygame.image.load("./img/enemy.jpg").convert()
 
         self.clock_flag = clock_flag
-
         self.tick_freq = fps
         self.clock = pygame.time.Clock()
 
@@ -33,22 +30,22 @@ class Watcher:
             pass
         else:
             print('ERROR: invalid option: show=', show)
-
-        self.show_replay = replay
-
         self.period = period
         self.duration = duration
+
+        self.show_replay = replay
 
         self.first_update = True
 
     def linkToGame(self, game):
         self.game = game
 
+    # Only creating window on first update
     def createScreen(self, w, h):
-        # pygame.init()
         self.sc = pygame.display.set_mode([w, h])
         self.sc.fill(Watcher.white)
         pygame.display.flip()
+
         self.player_im = pygame.image.load("./img/player.jpg").convert()
         self.enemy_im = pygame.image.load("./img/enemy.jpg").convert()
 
@@ -94,6 +91,7 @@ class Watcher:
         pygame.draw.rect(self.sc, (0, 255, 0),
                          [self.game.map.finish.tl.x, self.game.map.finish.tl.y, w, h])
 
+    # Checks if window is open
     def check_input(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
