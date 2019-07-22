@@ -91,14 +91,14 @@ class Watcher:
         for line in self.game.map.lines:
             w = line.br.x - line.tl.x
             h = line.br.y - line.tl.y
-            pygame.draw.Rect(self.sc, Watcher.black, [line.tl.x, line.tl.y, w, h])
+            pygame.draw.rect(self.sc, Watcher.black, [line.tl.x, line.tl.y, w, h])
 
         self.draw_finish()
 
     def draw_finish(self,):
         w = self.game.map.finish.br.x - self.game.map.finish.tl.x
         h = self.game.map.finish.br.y - self.game.map.finish.tl.y
-        pygame.draw.Rect(
+        pygame.draw.rect(
             self.sc,
             (0, 255, 0),
             [self.game.map.finish.tl.x, self.game.map.finish.tl.y, w, h],
