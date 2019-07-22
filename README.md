@@ -1,6 +1,6 @@
 # The World's Hardest Game Q-Learning
 
-This is an implementation of the flash game **The World's Hardest Game Q-Learning** and of a Q-Learning algorithm to play it. This fork contains numerous improvements over the original repo.
+This is an implementation of the flash game **The World's Hardest Game** and of a Q-Learning algorithm to play it. This fork contains numerous improvements over the original repo.
 
 Documentation is lacking, but you should be able to decypher what is going on.
 

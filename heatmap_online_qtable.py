@@ -3,17 +3,17 @@ import numpy as np
 import os
 import math
 
-if not os.path.isdir('result/online_heatmap'):
-    os.makedirs('result/online_heatmap')
+if not os.path.isdir("result/online_heatmap"):
+    os.makedirs("result/online_heatmap")
 
 xs = []
 ys = []
 V = []
 T = []
-with open('result/online_learn.txt', 'r') as f:
+with open("result/online_learn.txt", "r") as f:
     step = int(f.readline())
     for line in f:
-        words = line.split(',')
+        words = line.split(",")
         xs.append(int(words[0]))
         ys.append(int(words[1]))
         times = []
@@ -53,12 +53,12 @@ for x, y, t, v in zip(xs, ys, T, V):
 maxlog = math.log(vmax - vmin + 1)
 
 for i in range(1, m.shape[2]):  # Sometimes frame 0 is weird
-    fig = plt.imshow(m[:, :, i], cmap='hot')
+    fig = plt.imshow(m[:, :, i], cmap="hot")
     cbar = plt.colorbar(fig)
     cbar.set_clim(0, maxlog)
     cbar.draw_all()
     # plt.show()
     img = plt.gcf()
     img.set_size_inches(4, 3)
-    img.savefig('result/online_heatmap/im_%04d.png' % i, bbox_inches='tight', dpi=150)
+    img.savefig("result/online_heatmap/im_%04d.png" % i, bbox_inches="tight", dpi=150)
     plt.clf()

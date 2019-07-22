@@ -5,10 +5,10 @@ import math
 xs = []
 ys = []
 vals = []
-with open('result/offline_learn.txt', 'r') as f:
+with open("result/offline_learn.txt", "r") as f:
     step = int(f.readline())
     for line in f:
-        words = line.split(',')
+        words = line.split(",")
         xs.append(int(words[0]))
         ys.append(int(words[1]))
         vals.append(float(words[2]))
@@ -35,9 +35,9 @@ for x, y, v in zip(xs, ys, vals):
 
 maxlog = math.log(vmax - vmin + 1)
 
-fig = plt.imshow(m, cmap='hot')
+fig = plt.imshow(m, cmap="hot")
 cbar = plt.colorbar(fig)
 cbar.draw_all()
 img = plt.gcf()
 img.set_size_inches(4, 3)
-img.savefig('result/offline_heatmap.png', bbox_inches='tight', dpi=150)
+img.savefig("result/offline_heatmap.png", bbox_inches="tight", dpi=150)

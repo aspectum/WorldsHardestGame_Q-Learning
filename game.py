@@ -8,7 +8,6 @@ from map import Map
 
 
 class Game:
-
     def __init__(self, level=0, watcher=None, colision=True):
         # To show the game
         self.watcher = watcher
@@ -94,8 +93,13 @@ class Game:
         self.pl = Player(self, self.player_vel)
 
         for i in range(len(self.enemies)):
-            self.enemies[i] = EnemyCircle(self, 2 * self.player_vel, self.map.enemy_mov[i],
-                                          self.map.border1[i], self.map.border2[i])
+            self.enemies[i] = EnemyCircle(
+                self,
+                2 * self.player_vel,
+                self.map.enemy_mov[i],
+                self.map.border1[i],
+                self.map.border2[i],
+            )
 
     def init_positions(self):
         self.pl.rec.moveTo((self.map.start_x, self.map.start_y))
@@ -125,8 +129,8 @@ class Game:
                     qsz += len(self.learn.q_value_table[i][j].t)
         self.qsz = qsz
         if self.iter_num % self.iteration_print_interval == 0:
-            print('Iteration: ', self.iter_num)
-            print('Q-Table size: ', qsz)
+            print("Iteration: ", self.iter_num)
+            print("Q-Table size: ", qsz)
 
     def restart_state(self):
         del self.iter_state[:]
@@ -162,24 +166,26 @@ class Game:
             self.epochs = self.iter_num
             if self.colision:
                 qLearning.save_online(self)
-                replay_fname = 'result/replay.p'
+                replay_fname = "result/replay.p"
             else:
-                replay_fname = 'result/replay_offline.p'
+                replay_fname = "result/replay_offline.p"
                 qLearning.save_offline(self, True)
                 self.isWin = False
                 self.gameContinues = True
-            with open(replay_fname, 'wb') as f:
+            with open(replay_fname, "wb") as f:
                 pickle.dump(self.iter_state, f)
             if self.watcher is not None:
                 if self.watcher.show_replay:
-                    input('Press ENTER to start replay')
+                    input("Press ENTER to start replay")
                     self.watcher.replay(self.iter_state)
         else:
             if self.iter_num % self.player_moves_interval == 0:
                 if self.player_max_moves < self.player_max_max_moves:
                     self.player_max_moves += self.player_moves_step
 
-            if (not self.constant_eps) and (self.iter_num % self.eps_decrease_interval == 0):
+            if (not self.constant_eps) and (
+                self.iter_num % self.eps_decrease_interval == 0
+            ):
                 if self.learn.eps > 0.2:
                     self.learn.eps /= 2
 

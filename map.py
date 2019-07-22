@@ -40,18 +40,18 @@ class Map:
 
     def readInfo(self, f):
         for line in f:
-            if 'Init' in line:
+            if "Init" in line:
                 break
         self.start_x, self.start_y = map(int, f.readline().split(","))
         for line in f:
-            if 'Enemies' in line:
+            if "Enemies" in line:
                 break
         self.number_enemy = int(f.readline())
         for i in range(self.number_enemy):
             linha = f.readline().split(",")
             self.posx.append(int(linha[0]))
             self.posy.append(int(linha[1]))
-            if linha[2] == 'True':
+            if linha[2] == "True":
                 self.enemy_mov.append(True)
             else:
                 self.enemy_mov.append(False)
@@ -66,14 +66,18 @@ class Map:
 
     def parseInput(self, f):
         for line in f:
-            if 'Map' in line:
+            if "Map" in line:
                 break
         for line in f:
-            if 'End' in line:
+            if "End" in line:
                 break
-            temp = line.split(' ')
-            self.coor.append((tuple(map(int, temp[0].split(","))),
-                             tuple(map(int, temp[1].split(",")))))
+            temp = line.split(" ")
+            self.coor.append(
+                (
+                    tuple(map(int, temp[0].split(","))),
+                    tuple(map(int, temp[1].split(","))),
+                )
+            )
 
     def drawMap(self, level):
         for c in self.coor:
@@ -87,7 +91,7 @@ class Map:
         f = open(name)
 
         for line in f:
-            if 'End' in line:
+            if "End" in line:
                 break
         linha = f.readline().split(",")
         for x in range(0, 4):
@@ -95,7 +99,7 @@ class Map:
         self.finish = self._drawRect((linha[0], linha[1]), linha[2], linha[3])
 
     def _drawLine(self, start, finish, thickness):
-        if start[0] == finish[0]:   # Vertical
+        if start[0] == finish[0]:  # Vertical
             if start[1] > finish[1]:
                 temp = start
                 start = finish
@@ -109,7 +113,7 @@ class Map:
             br = (br_x, br_y)
 
             line = rect(tl, br)
-        elif start[1] == finish[1]:   # Horizontal
+        elif start[1] == finish[1]:  # Horizontal
             if start[0] > finish[0]:
                 temp = start
                 start = finish
@@ -123,7 +127,7 @@ class Map:
             br = (br_x, br_y)
 
             line = rect(tl, br)
-        else:   # Diagonal, shouldn't happen
+        else:  # Diagonal, shouldn't happen
             print("ERROR: Level shouldn't have diagonal lines!")
             print(start)
             print(finish)
@@ -142,5 +146,8 @@ class Map:
 
     def makeCheckpoints(self):
         for i in range(len(self.checkpointx)):
-            c = rect((self.checkpointx[i] - 5, self.checkpointy[i] - 5), (self.checkpointx[i] + 5, self.checkpointy[i] + 5))
+            c = rect(
+                (self.checkpointx[i] - 5, self.checkpointy[i] - 5),
+                (self.checkpointx[i] + 5, self.checkpointy[i] + 5),
+            )
             self.checkpoints.append(c)

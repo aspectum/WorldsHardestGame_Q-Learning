@@ -2,6 +2,7 @@ import random
 from collections import defaultdict
 import time
 import os
+
 # from shutil import copyfile
 
 MOVES = ["right", "left", "up", "down", "stay"]  # Possible moves
@@ -13,9 +14,9 @@ class QLearning:
         self.pl = game.pl
         self.game = game
 
-        self.eps = 0.2      # Random action chance
-        self.lr = 0.4       # Learning rate
-        self.gamma = 0.9    # Future rewards multiplicator (discount)
+        self.eps = 0.2  # Random action chance
+        self.lr = 0.4  # Learning rate
+        self.gamma = 0.9  # Future rewards multiplicator (discount)
 
         if online:
             self.q_value_table = self.mult_dim_dict(2, QValues, self)
@@ -72,9 +73,11 @@ class QValues:
         self.table = self.QL.q_value_table
 
         self.pl = self.QL.game.pl
-        self.val = []       # values in each 'time' (self.t)
-        self.t = []         # 'time' (more like tick number or iteration) - representing 'board state' (i.e. enemy positions) with a single value
-        self.init_val = 0   # initial value
+        self.val = []  # values in each 'time' (self.t)
+        self.t = (
+            []
+        )  # 'time' (more like tick number or iteration) - representing 'board state' (i.e. enemy positions) with a single value
+        self.init_val = 0  # initial value
 
     def update_value(self):
 
@@ -87,7 +90,9 @@ class QValues:
         best_reward, _ = self.QL.find_max_reward()
 
         # Classic Q-Learning learning formula
-        self.val[self.t.index(self.pl.mov_num)] += self.QL.lr * (self.QL.gamma * best_reward - self.val[self.t.index(self.pl.mov_num)])
+        self.val[self.t.index(self.pl.mov_num)] += self.QL.lr * (
+            self.QL.gamma * best_reward - self.val[self.t.index(self.pl.mov_num)]
+        )
 
     def update_after_death(self):
         if self.pl.mov_num not in self.t:
@@ -123,10 +128,14 @@ class QValues_offline:
         self.QL = QLearning
         self.table = self.QL.q_value_table
 
-        self.val = 0  # single value (no enemies -> no different board states for same position)
+        self.val = (
+            0
+        )  # single value (no enemies -> no different board states for same position)
 
     def update_value(self):
-        reward = -1  # If player keeps going to same places, this starts to add up, so motivates it to explore
+        reward = (
+            -1
+        )  # If player keeps going to same places, this starts to add up, so motivates it to explore
         best_reward, _ = self.QL.find_max_reward()
 
         self.val += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val)
@@ -146,29 +155,31 @@ class QValues_offline:
 
 def save_offline(obj, intermediate):
     if intermediate:
-        if not os.path.isdir('qtables'):
-            os.makedirs('qtables')
-        filename = os.path.join('qtables', 'offline_learn_{}.txt'.format(int(time.time())))
+        if not os.path.isdir("qtables"):
+            os.makedirs("qtables")
+        filename = os.path.join(
+            "qtables", "offline_learn_{}.txt".format(int(time.time()))
+        )
     else:
-        filename = 'offline_learn.txt'
-    with open(filename, 'w') as f:
-        f.write(str(obj.player_vel) + '\n')
+        filename = "offline_learn.txt"
+    with open(filename, "w") as f:
+        f.write(str(obj.player_vel) + "\n")
         for i in obj.learn.q_value_table:
             for j in obj.learn.q_value_table[i]:
                 value = obj.learn.q_value_table[i][j].get_val_at_t(0)
-                line = str(i) + ',' + str(j) + ',' + str(value) + ',\n'
+                line = str(i) + "," + str(j) + "," + str(value) + ",\n"
                 f.write(line)
     # copyfile('offline_learn.txt', 'result/offline_learn.txt')
 
 
 # To load to train online (use this values as ininial)
 def load_online(obj):
-    if os.path.isfile('offline_learn.txt'):
+    if os.path.isfile("offline_learn.txt"):
         obj.learn_offline_initial_conditions = QLearning(obj, online=False)
-        with open('offline_learn.txt', 'r') as f:
+        with open("offline_learn.txt", "r") as f:
             f.readline()
             for line in f:
-                words = line.split(',')
+                words = line.split(",")
                 x = int(words[0])
                 y = int(words[1])
                 value = float(words[2])
@@ -177,15 +188,15 @@ def load_online(obj):
 
 
 def save_online(obj):
-    filename = 'result/online_learn.txt'
-    with open(filename, 'w') as f:
-        f.write(str(obj.player_vel) + '\n')
+    filename = "result/online_learn.txt"
+    with open(filename, "w") as f:
+        f.write(str(obj.player_vel) + "\n")
         for i in obj.learn.q_value_table:
             for j in obj.learn.q_value_table[i]:
-                f.write(str(i) + ',' + str(j) + ',')
+                f.write(str(i) + "," + str(j) + ",")
                 if len(obj.learn.q_value_table[i][j].t) > 0:
                     for k in range(len(obj.learn.q_value_table[i][j].t)):
                         t = obj.learn.q_value_table[i][j].t[k]
                         v = obj.learn.q_value_table[i][j].val[k]
-                        f.write(str(t) + ',' + str(v) + ',')
-                f.write('\n')
+                        f.write(str(t) + "," + str(v) + ",")
+                f.write("\n")

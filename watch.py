@@ -7,7 +7,15 @@ class Watcher:
     black = 0, 0, 0
     white = 255, 255, 255
 
-    def __init__(self, show='all', replay=False, period=None, duration=None, fps=60, clock_flag=True):
+    def __init__(
+        self,
+        show="all",
+        replay=False,
+        period=None,
+        duration=None,
+        fps=60,
+        clock_flag=True,
+    ):
         self.game = None
         self.sc = None
         pygame.init()
@@ -22,14 +30,14 @@ class Watcher:
 
         self.watch_all = False
         self.watch_periodic = False
-        if show == 'all':
+        if show == "all":
             self.watch_all = True
-        elif show == 'periodic':
+        elif show == "periodic":
             self.watch_periodic = True
-        elif show == 'nothing':
+        elif show == "nothing":
             pass
         else:
-            print('ERROR: invalid option: show=', show)
+            print("ERROR: invalid option: show=", show)
         self.period = period
         self.duration = duration
 
@@ -64,9 +72,12 @@ class Watcher:
 
         self.drawMap()
 
-        self.lbl_iter_num = self.myfont.render("Iter number: " + str(self.game.iter_num), 1, Watcher.black)
-        self.lbl_max_moves = self.myfont.render("Max moves: " + str(self.game.player_max_moves),
-                                                1, Watcher.black)
+        self.lbl_iter_num = self.myfont.render(
+            "Iter number: " + str(self.game.iter_num), 1, Watcher.black
+        )
+        self.lbl_max_moves = self.myfont.render(
+            "Max moves: " + str(self.game.player_max_moves), 1, Watcher.black
+        )
 
         self.sc.blit(self.lbl_iter_num, (20, 100))
         self.sc.blit(self.lbl_max_moves, (20, 130))
@@ -80,16 +91,18 @@ class Watcher:
         for line in self.game.map.lines:
             w = line.br.x - line.tl.x
             h = line.br.y - line.tl.y
-            pygame.draw.rect(self.sc, Watcher.black,
-                             [line.tl.x, line.tl.y, w, h])
+            pygame.draw.rect(self.sc, Watcher.black, [line.tl.x, line.tl.y, w, h])
 
         self.drawFinish()
 
-    def drawFinish(self, ):
+    def drawFinish(self,):
         w = self.game.map.finish.br.x - self.game.map.finish.tl.x
         h = self.game.map.finish.br.y - self.game.map.finish.tl.y
-        pygame.draw.rect(self.sc, (0, 255, 0),
-                         [self.game.map.finish.tl.x, self.game.map.finish.tl.y, w, h])
+        pygame.draw.rect(
+            self.sc,
+            (0, 255, 0),
+            [self.game.map.finish.tl.x, self.game.map.finish.tl.y, w, h],
+        )
 
     # Checks if window is open
     def check_input(self):
@@ -105,9 +118,12 @@ class Watcher:
         iter_num = state[2]
         max_moves = state[3]
 
-        self.lbl_iter_num = self.myfont.render("Iter number: " + str(iter_num), 1, Watcher.black)
-        self.lbl_max_moves = self.myfont.render("Max moves: " + str(max_moves),
-                                                1, Watcher.black)
+        self.lbl_iter_num = self.myfont.render(
+            "Iter number: " + str(iter_num), 1, Watcher.black
+        )
+        self.lbl_max_moves = self.myfont.render(
+            "Max moves: " + str(max_moves), 1, Watcher.black
+        )
 
         for i in range(4, len(state)):
             self.check_input()
