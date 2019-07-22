@@ -15,10 +15,10 @@ class EnemyCircle:
 
     def move(self):
         # Collision with player
-        if self.rec.collides_with(self.game.pl.rec) and self.game.colision:
+        if self.rec.collides_with(self.game.player.rec) and self.game.colision:
             self.game.game_continues = False
-            self.game.learn.q_value_table[self.game.pl.rec.tl.x][
-                self.game.pl.rec.tl.y
+            self.game.learn.q_value_table[self.game.player.rec.tl.x][
+                self.game.player.rec.tl.y
             ].update_after_death()
 
         # Distiction between horizontal and vertical movement

@@ -64,7 +64,7 @@ class Watcher:
         self.check_input()
         self.sc.fill(Watcher.white)
 
-        tl = self.game.pl.rec.get_pos()
+        tl = self.game.player.rec.get_pos()
         self.sc.blit(self.player_im, tl)
         for e in self.game.enemies:
             tl = e.rec.get_pos()

@@ -9,7 +9,7 @@ from map import Map
 
 class Game:
     def __init__(self, level=0, watcher=None, colision=True):
-        # To show the game
+        # watcher settings (to show game)
         self.watcher = watcher
         self.watch = None
         self.show_replay = None
@@ -24,7 +24,7 @@ class Game:
         self.level = level
 
         # Player attributes
-        self.pl = None
+        self.player = None
 
         # map of the game
         self.map = Map(self, self.level)
@@ -72,7 +72,7 @@ class Game:
         while not self.is_win:
             self.restart_state()
             self.init_positions()
-            self.pl.mov_num = 0
+            self.player.mov_num = 0
 
             while self.game_continues:
                 if self.should_i_watch():
@@ -90,7 +90,7 @@ class Game:
 
     # functions used while game
     def create_env(self):
-        self.pl = Player(self, self.player_vel)
+        self.player = Player(self, self.player_vel)
 
         for i in range(len(self.enemies)):
             self.enemies[i] = EnemyCircle(
@@ -102,7 +102,7 @@ class Game:
             )
 
     def init_positions(self):
-        self.pl.rec.move_to((self.map.start_x, self.map.start_y))
+        self.player.rec.move_to((self.map.start_x, self.map.start_y))
 
         for i in range(len(self.enemies)):
             self.enemies[i].rec.move_to((self.map.posx[i], self.map.posy[i]))
@@ -144,7 +144,7 @@ class Game:
         self.iter_state.append(self.player_max_moves)
 
     def save_state(self):
-        player = self.pl.rec.get_pos()
+        player = self.player.rec.get_pos()
 
         enemies = []
         for e in self.enemies:
@@ -162,7 +162,7 @@ class Game:
             print("Hooorraaaay")
             print("Win after %d iterations" % self.iter_num)
             print("Max moves: ", self.player_max_moves)
-            print("Moves used: ", self.pl.mov_num)
+            print("Moves used: ", self.player.mov_num)
             self.epochs = self.iter_num
             if self.colision:
                 qLearning.save_online(self)

@@ -11,7 +11,7 @@ MOVES = ["right", "left", "up", "down", "stay"]  # Possible moves
 # Q-table and helper methods
 class QLearning:
     def __init__(self, game, online=True):
-        self.pl = game.pl
+        self.player = game.player
         self.game = game
 
         self.eps = 0.2  # Random action chance
@@ -35,21 +35,21 @@ class QLearning:
             self.move_randomly()
         else:
             self.move_optimally()
-        x, y = self.game.pl.rec.tl.x, self.game.pl.rec.tl.y
+        x, y = self.game.player.rec.tl.x, self.game.player.rec.tl.y
         self.q_value_table[x][y].update_value()
 
     def move_randomly(self):
         i = random.randint(0, len(MOVES) - 1)
-        self.game.pl.move(MOVES[i])
+        self.game.player.move(MOVES[i])
 
     def move_optimally(self):
-        self.game.pl.move(self.find_best_move())
+        self.game.player.move(self.find_best_move())
 
     def find_max_reward(self):
         li = []
         for m in MOVES:
-            x, y = self.pl.move_simulation(m)
-            li.append(self.q_value_table[x][y].get_val_at_t(self.pl.mov_num + 1))
+            x, y = self.player.move_simulation(m)
+            li.append(self.q_value_table[x][y].get_val_at_t(self.player.mov_num + 1))
         maxi = max(li)
 
         return maxi, li
@@ -72,7 +72,7 @@ class QValues:
         self.QL = QLearning
         self.table = self.QL.q_value_table
 
-        self.pl = self.QL.game.pl
+        self.player = self.QL.game.player
         self.val = []  # values in each 'time' (self.t)
         self.t = (
             []
@@ -81,8 +81,8 @@ class QValues:
 
     def update_value(self):
 
-        if self.pl.mov_num not in self.t:
-            self.t.append(self.pl.mov_num)
+        if self.player.mov_num not in self.t:
+            self.t.append(self.player.mov_num)
             self.val.append(self.init_val)
 
         # reward = -1  #  Not using this reward in online mode
@@ -90,30 +90,30 @@ class QValues:
         best_reward, _ = self.QL.find_max_reward()
 
         # Classic Q-Learning learning formula
-        self.val[self.t.index(self.pl.mov_num)] += self.QL.lr * (
-            self.QL.gamma * best_reward - self.val[self.t.index(self.pl.mov_num)]
+        self.val[self.t.index(self.player.mov_num)] += self.QL.lr * (
+            self.QL.gamma * best_reward - self.val[self.t.index(self.player.mov_num)]
         )
 
     def update_after_death(self):
-        if self.pl.mov_num not in self.t:
-            self.t.append(self.pl.mov_num)
+        if self.player.mov_num not in self.t:
+            self.t.append(self.player.mov_num)
             self.val.append(-3000)
         else:
-            self.val[self.t.index(self.pl.mov_num)] -= 3000
+            self.val[self.t.index(self.player.mov_num)] -= 3000
 
     def update_wall_colision(self):
-        if self.pl.mov_num not in self.t:
-            self.t.append(self.pl.mov_num)
+        if self.player.mov_num not in self.t:
+            self.t.append(self.player.mov_num)
             self.val.append(-500)
         else:
-            self.val[self.t.index(self.pl.mov_num)] -= 500
+            self.val[self.t.index(self.player.mov_num)] -= 500
 
     def update_game_won(self):
-        if self.pl.mov_num not in self.t:
-            self.t.append(self.pl.mov_num)
-            self.val.append(100000 / self.QL.game.pl.mov_num)
+        if self.player.mov_num not in self.t:
+            self.t.append(self.player.mov_num)
+            self.val.append(100000 / self.QL.game.player.mov_num)
         else:
-            self.val[self.t.index(self.pl.mov_num)] += 100000 / self.QL.game.pl.mov_num
+            self.val[self.t.index(self.player.mov_num)] += 100000 / self.QL.game.player.mov_num
 
     def get_val_at_t(self, mov):
         if mov in self.t:
@@ -147,7 +147,7 @@ class QValues_offline:
         self.val -= 1000
 
     def update_game_won(self):
-        self.val += 100000 / self.QL.game.pl.mov_num
+        self.val += 100000 / self.QL.game.player.mov_num
 
     def get_val_at_t(self, mov):
         return self.val
