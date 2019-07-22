@@ -36,13 +36,14 @@ class Player:
             self.game.isWin = True
             self.game.learn.q_value_table[self.rec.tl.x][self.rec.tl.y].update_game_won()
 
-        # intersection logic with borders
+        # collision logic with borders
         for line in self.game.map.lines:
             if self.rec.collidesWith(line):
                 # self.game.learn.q_value_table[self.rec.tl.x][self.rec.tl.y].update_wall_colision()
                 self.rec.move(self.move_dir[self.opposite_dir[d]])
                 self.game.learn.q_value_table[self.rec.tl.x][self.rec.tl.y].update_wall_colision()
 
+        # collision with enemies
         for e in self.game.enemies:
             if self.rec.collidesWith(e.rec) and self.game.colision:
                 self.game.gameContinues = False
@@ -50,7 +51,3 @@ class Player:
 
     def move_simulation(self, d):
         return (self.rec.tl.x + self.move_dir[d][0], self.rec.tl.y + self.move_dir[d][1])
-
-    # What is your purpose?
-    def mov_back_simulation(self, d):
-        return self.move_simulation(self.opposite_dir(d))
