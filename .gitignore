@@ -111,7 +111,7 @@ venv.bak/
 .vscode
 .flake8
 replay.p
-offline_learn.txt
+offline_qtable.txt
 qtables
 qtables/*
 resultado

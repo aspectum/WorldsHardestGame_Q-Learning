@@ -10,7 +10,7 @@ xs = []
 ys = []
 V = []
 T = []
-with open("result/online_learn.txt", "r") as f:
+with open("result/online_qtable.txt", "r") as f:
     step = int(f.readline())
     for line in f:
         words = line.split(",")

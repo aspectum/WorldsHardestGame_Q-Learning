@@ -66,17 +66,17 @@ class QLearning:
         return best_move
 
 
+# q-table entry if online training
 class QValues:
     def __init__(self, QLearning):
-
         self.QL = QLearning
         self.table = self.QL.q_value_table
 
         self.player = self.QL.game.player
-        self.val = []  # values in each 'time' (self.t)
-        self.t = (
-            []
-        )  # 'time' (more like tick number or iteration) - representing 'board state' (i.e. enemy positions) with a single value
+        self.val = []  # values in each "time" (self.t)
+
+        # "time" (more like tick number) - representing 'board state' (i.e. enemy positions) with a single value
+        self.t = []
         self.init_val = 0  # initial value
 
     def update_value(self):
@@ -109,11 +109,14 @@ class QValues:
             self.val[self.t.index(self.player.mov_num)] -= 500
 
     def update_game_won(self):
+        # reward inversely proportional to number of steps to get there
         if self.player.mov_num not in self.t:
             self.t.append(self.player.mov_num)
             self.val.append(100000 / self.QL.game.player.mov_num)
         else:
-            self.val[self.t.index(self.player.mov_num)] += 100000 / self.QL.game.player.mov_num
+            self.val[self.t.index(self.player.mov_num)] += (
+                100000 / self.QL.game.player.mov_num
+            )
 
     def get_val_at_t(self, mov):
         if mov in self.t:
@@ -122,20 +125,18 @@ class QValues:
             return self.init_val
 
 
+# q-table entry if offline training
 class QValues_offline:
     def __init__(self, QLearning):
-
         self.QL = QLearning
         self.table = self.QL.q_value_table
 
-        self.val = (
-            0
-        )  # single value (no enemies -> no different board states for same position)
+        # single value (no enemies -> no different board states for same position)
+        self.val = 0
 
     def update_value(self):
-        reward = (
-            -1
-        )  # If player keeps going to same places, this starts to add up, so motivates it to explore
+        # If player keeps going to same places, this starts to add up, so motivates it to explore
+        reward = -1
         best_reward, _ = self.QL.find_max_reward()
 
         self.val += self.QL.lr * (reward + self.QL.gamma * best_reward - self.val)
@@ -153,15 +154,16 @@ class QValues_offline:
         return self.val
 
 
-def save_offline(obj, intermediate):
-    if intermediate:
+# saves offline q-table
+def save_offline_qtable(obj, intermediate):
+    if intermediate:  # temporary qtables
         if not os.path.isdir("qtables"):
             os.makedirs("qtables")
         filename = os.path.join(
             "qtables", "offline_learn_{}.txt".format(int(time.time()))
         )
     else:
-        filename = "offline_learn.txt"
+        filename = "offline_qtable.txt"
     with open(filename, "w") as f:
         f.write(str(obj.player_vel) + "\n")
         for i in obj.learn.q_value_table:
@@ -169,26 +171,25 @@ def save_offline(obj, intermediate):
                 value = obj.learn.q_value_table[i][j].get_val_at_t(0)
                 line = str(i) + "," + str(j) + "," + str(value) + ",\n"
                 f.write(line)
-    # copyfile('offline_learn.txt', 'result/offline_learn.txt')
+    # copyfile('offline_qtable.txt', 'result/offline_qtable.txt')
 
 
-# To load to train online (use this values as ininial)
-def load_online(obj):
-    if os.path.isfile("offline_learn.txt"):
-        obj.learn_offline_initial_conditions = QLearning(obj, online=False)
-        with open("offline_learn.txt", "r") as f:
+# loads offline q-table to online training (use these values as ininial)
+def load_offline_qtable(obj):
+    if os.path.isfile("offline_qtable.txt"):
+        with open("offline_qtable.txt", "r") as f:
             f.readline()
             for line in f:
                 words = line.split(",")
                 x = int(words[0])
                 y = int(words[1])
                 value = float(words[2])
-                obj.learn_offline_initial_conditions.q_value_table[x][y].val = value
                 obj.learn.q_value_table[x][y].init_val = value
 
 
+# saves online q-table
 def save_online(obj):
-    filename = "result/online_learn.txt"
+    filename = "result/online_qtable.txt"
     with open(filename, "w") as f:
         f.write(str(obj.player_vel) + "\n")
         for i in obj.learn.q_value_table:

@@ -1,3 +1,7 @@
+# Code is a bit hacky and confusing
+# Implemented levels 0 to 5
+# Ignoring checkpoints (didn't work as expected)
+
 import sys
 
 from rectangle import Rect

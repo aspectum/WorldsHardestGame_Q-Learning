@@ -5,7 +5,7 @@ import math
 xs = []
 ys = []
 vals = []
-with open("result/offline_learn.txt", "r") as f:
+with open("result/offline_qtable.txt", "r") as f:
     step = int(f.readline())
     for line in f:
         words = line.split(",")
