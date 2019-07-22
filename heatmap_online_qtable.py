@@ -52,7 +52,7 @@ for x, y, t, v in zip(xs, ys, T, V):
 
 maxlog = math.log(vmax - vmin + 1)
 
-for i in range(m.shape[2]):
+for i in range(1, m.shape[2]):  # Sometimes frame 0 is weird
     fig = plt.imshow(m[:, :, i], cmap='hot')
     cbar = plt.colorbar(fig)
     cbar.set_clim(0, maxlog)
@@ -62,13 +62,3 @@ for i in range(m.shape[2]):
     img.set_size_inches(4, 3)
     img.savefig('result/online_heatmap/im_%04d.png' % i, bbox_inches='tight', dpi=150)
     plt.clf()
-
-# from glob import glob
-# import imageio
-
-# images = []
-# filenames = sorted(glob('resultado/online_heatmap/*.png'))
-
-# for filename in filenames:
-#     images.append(imageio.imread(filename))
-# imageio.mimsave('resultado/online_heatmap/heatmap.gif', images, duration=0.1)

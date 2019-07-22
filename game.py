@@ -65,6 +65,8 @@ class Game:
         self.game_loop()
         if not self.colision:
             qLearning.save_offline(self, False)
+        if self.watcher is not None:
+            self.watcher.quit()
 
     def game_loop(self):
 

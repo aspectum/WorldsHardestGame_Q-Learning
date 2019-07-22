@@ -130,6 +130,10 @@ class Watcher:
             if self.clock_flag:
                 self.clock.tick(self.tick_freq)
 
+    def quit(self):
+        pygame.display.quit()
+        pygame.quit()
+
 
 # On focus and mouse hover
 def waitForWindowOnFocus():
