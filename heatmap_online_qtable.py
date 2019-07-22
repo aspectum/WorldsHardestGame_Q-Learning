@@ -59,7 +59,8 @@ for i in range(m.shape[2]):
     cbar.draw_all()
     # plt.show()
     img = plt.gcf()
-    img.savefig('result/online_heatmap/im_%04d.png' % i, bbox_inches='tight')
+    img.set_size_inches(4, 3)
+    img.savefig('result/online_heatmap/im_%04d.png' % i, bbox_inches='tight', dpi=150)
     plt.clf()
 
 # from glob import glob
