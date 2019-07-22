@@ -1,5 +1,5 @@
 # Why self.opposite_dir?
-from rectangle import rect
+from rectangle import Rect
 
 
 class Player:
@@ -10,7 +10,7 @@ class Player:
         self.speed = speed
         self.game = game
 
-        self.rec = rect((0, 0), (22, 22))
+        self.rec = Rect((0, 0), (22, 22))
 
         self.move_dir = {
             "right": (self.speed, 0),
@@ -32,7 +32,7 @@ class Player:
 
         # reaching max move limit
         if self.game.player_max_moves == self.mov_num:
-            self.game.gameContinues = False
+            self.game.game_continues = False
             return
 
         # move player and update coordinates
@@ -40,16 +40,16 @@ class Player:
         self.mov_num += 1
 
         # reaching finish
-        if self.rec.collidesWith(self.game.map.finish):
-            self.game.gameContinues = False
-            self.game.isWin = True
+        if self.rec.collides_with(self.game.map.finish):
+            self.game.game_continues = False
+            self.game.is_win = True
             self.game.learn.q_value_table[self.rec.tl.x][
                 self.rec.tl.y
             ].update_game_won()
 
         # collision logic with borders
         for line in self.game.map.lines:
-            if self.rec.collidesWith(line):
+            if self.rec.collides_with(line):
                 # self.game.learn.q_value_table[self.rec.tl.x][self.rec.tl.y].update_wall_colision()
                 self.rec.move(self.move_dir[self.opposite_dir[d]])
                 self.game.learn.q_value_table[self.rec.tl.x][
@@ -58,8 +58,8 @@ class Player:
 
         # collision with enemies
         for e in self.game.enemies:
-            if self.rec.collidesWith(e.rec) and self.game.colision:
-                self.game.gameContinues = False
+            if self.rec.collides_with(e.rec) and self.game.colision:
+                self.game.game_continues = False
                 self.game.learn.q_value_table[self.rec.tl.x][
                     self.rec.tl.y
                 ].update_after_death()

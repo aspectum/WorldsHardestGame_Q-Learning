@@ -19,8 +19,8 @@ class Game:
             self.show_replay = self.watcher.show_replay
 
         # game info
-        self.gameContinues = True
-        self.isWin = False
+        self.game_continues = True
+        self.is_win = False
         self.level = level
 
         # Player attributes
@@ -52,7 +52,7 @@ class Game:
         self.qsz = 0
 
         # draw player, enemies and map
-        self.createEnv()
+        self.create_env()
 
         # attributes for Q-Learning with incremental learning
         self.learn = QLearning(self, online=colision)
@@ -69,27 +69,27 @@ class Game:
 
     def game_loop(self):
 
-        while not self.isWin:
+        while not self.is_win:
             self.restart_state()
             self.init_positions()
             self.pl.mov_num = 0
 
-            while self.gameContinues:
-                if self.shouldIWatch():
-                    self.watcher.updateMap()
+            while self.game_continues:
+                if self.should_i_watch():
+                    self.watcher.update_map()
                 self.learn.find_move()
-                self.updateMap(self.level)
+                self.update_map(self.level)
                 self.save_state()
 
             self.print_status()
-            self.endGame()
+            self.end_game()
 
             if self.iter_num > self.max_iterations:
                 print("Reached maximum of iterations and couldn't hit goal")
                 return
 
     # functions used while game
-    def createEnv(self):
+    def create_env(self):
         self.pl = Player(self, self.player_vel)
 
         for i in range(len(self.enemies)):
@@ -102,16 +102,16 @@ class Game:
             )
 
     def init_positions(self):
-        self.pl.rec.moveTo((self.map.start_x, self.map.start_y))
+        self.pl.rec.move_to((self.map.start_x, self.map.start_y))
 
         for i in range(len(self.enemies)):
-            self.enemies[i].rec.moveTo((self.map.posx[i], self.map.posy[i]))
+            self.enemies[i].rec.move_to((self.map.posx[i], self.map.posy[i]))
 
-    def updateMap(self, level):
+    def update_map(self, level):
         for e in self.enemies:
             e.move()
 
-    def shouldIWatch(self):
+    def should_i_watch(self):
         if self.watch:
             if self.watcher.watch_all:
                 return True
@@ -144,11 +144,11 @@ class Game:
         self.iter_state.append(self.player_max_moves)
 
     def save_state(self):
-        player = self.pl.rec.getPos()
+        player = self.pl.rec.get_pos()
 
         enemies = []
         for e in self.enemies:
-            enemies.append(e.rec.getPos())
+            enemies.append(e.rec.get_pos())
 
         loop_state = []
         loop_state.append(player)
@@ -156,9 +156,9 @@ class Game:
 
         self.iter_state.append(loop_state)
 
-    def endGame(self):
+    def end_game(self):
         self.iter_num += 1
-        if self.isWin:
+        if self.is_win:
             print("Hooorraaaay")
             print("Win after %d iterations" % self.iter_num)
             print("Max moves: ", self.player_max_moves)
@@ -170,8 +170,8 @@ class Game:
             else:
                 replay_fname = "result/replay_offline.p"
                 qLearning.save_offline(self, True)
-                self.isWin = False
-                self.gameContinues = True
+                self.is_win = False
+                self.game_continues = True
             with open(replay_fname, "wb") as f:
                 pickle.dump(self.iter_state, f)
             if self.watcher is not None:
@@ -191,4 +191,4 @@ class Game:
 
             # restart the game
 
-            self.gameContinues = True
+            self.game_continues = True

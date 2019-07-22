@@ -1,6 +1,6 @@
 import sys
 
-from rectangle import rect
+from rectangle import Rect
 
 
 class Map:
@@ -24,21 +24,21 @@ class Map:
         self.checkpointy = []
         self.checkpoints = []
 
-        self.readFile(level)
-        self.drawMap(level)
-        self.makeCheckpoints()
+        self.read_file(level)
+        self.draw_map(level)
+        self.make_checkpoints()
         self.checkpoints.append(self.finish)
 
-    def readFile(self, lvl):
+    def read_file(self, lvl):
 
         name = ""
         name += "./levels/" + "level" + str(lvl) + ".txt"
         f = open(name)
-        self.readInfo(f)
+        self.read_info(f)
         f = open(name)
-        self.parseInput(f)
+        self.parse_input(f)
 
-    def readInfo(self, f):
+    def read_info(self, f):
         for line in f:
             if "Init" in line:
                 break
@@ -64,7 +64,7 @@ class Map:
             self.checkpointx.append(int(linha[0]))
             self.checkpointy.append(int(linha[1]))
 
-    def parseInput(self, f):
+    def parse_input(self, f):
         for line in f:
             if "Map" in line:
                 break
@@ -79,13 +79,13 @@ class Map:
                 )
             )
 
-    def drawMap(self, level):
+    def draw_map(self, level):
         for c in self.coor:
-            self.lines.append(self._drawLine(c[0], c[1], 3))
+            self.lines.append(self.draw_line(c[0], c[1], 3))
 
-        self.drawFinish(level)
+        self.draw_finish(level)
 
-    def drawFinish(self, level):
+    def draw_finish(self, level):
         name = ""
         name += "./levels/" + "level" + str(level) + ".txt"
         f = open(name)
@@ -96,9 +96,9 @@ class Map:
         linha = f.readline().split(",")
         for x in range(0, 4):
             linha[x] = int(linha[x])
-        self.finish = self._drawRect((linha[0], linha[1]), linha[2], linha[3])
+        self.finish = self.draw_rect((linha[0], linha[1]), linha[2], linha[3])
 
-    def _drawLine(self, start, finish, thickness):
+    def draw_line(self, start, finish, thickness):
         if start[0] == finish[0]:  # Vertical
             if start[1] > finish[1]:
                 temp = start
@@ -112,7 +112,7 @@ class Map:
             br_y = finish[1]
             br = (br_x, br_y)
 
-            line = rect(tl, br)
+            line = Rect(tl, br)
         elif start[1] == finish[1]:  # Horizontal
             if start[0] > finish[0]:
                 temp = start
@@ -126,7 +126,7 @@ class Map:
             br_y = finish[1] + 1
             br = (br_x, br_y)
 
-            line = rect(tl, br)
+            line = Rect(tl, br)
         else:  # Diagonal, shouldn't happen
             print("ERROR: Level shouldn't have diagonal lines!")
             print(start)
@@ -135,18 +135,18 @@ class Map:
 
         return line
 
-    def _drawRect(self, tl, w, h):
+    def draw_rect(self, tl, w, h):
         br_x = tl[0] + w
         br_y = tl[1] + h
         br = (br_x, br_y)
 
-        rec = rect(tl, br)
+        rec = Rect(tl, br)
 
         return rec
 
-    def makeCheckpoints(self):
+    def make_checkpoints(self):
         for i in range(len(self.checkpointx)):
-            c = rect(
+            c = Rect(
                 (self.checkpointx[i] - 5, self.checkpointy[i] - 5),
                 (self.checkpointx[i] + 5, self.checkpointy[i] + 5),
             )

@@ -1,9 +1,9 @@
-class rect:
+class Rect:
     def __init__(self, tl, br):
-        self.tl = point(tl[0], tl[1])
-        self.br = point(br[0], br[1])
+        self.tl = Point(tl[0], tl[1])
+        self.br = Point(br[0], br[1])
 
-    def getPos(self):
+    def get_pos(self):
         return [self.tl.x, self.tl.y], [self.br.x, self.br.y]
 
     def move(self, direction):
@@ -14,7 +14,7 @@ class rect:
         self.br.x += x
         self.br.y += y
 
-    def moveTo(self, tl):
+    def move_to(self, tl):
         dx = tl[0] - self.tl.x
         dy = tl[1] - self.tl.y
         self.tl.x += dx
@@ -22,7 +22,7 @@ class rect:
         self.br.x += dx
         self.br.y += dy
 
-    def collidesWith(self, rec):
+    def collides_with(self, rec):
         if (self.tl.x > rec.br.x) or (rec.tl.x > self.br.x):
             return False
 
@@ -32,7 +32,7 @@ class rect:
         return True
 
 
-class point:
+class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y

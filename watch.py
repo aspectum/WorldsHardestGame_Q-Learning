@@ -57,20 +57,20 @@ class Watcher:
         self.player_im = pygame.image.load("./img/player.jpg").convert()
         self.enemy_im = pygame.image.load("./img/enemy.jpg").convert()
 
-    def updateMap(self):
+    def update_map(self):
         if self.first_update:
             self.createScreen(1000, 1000)
             self.first_update = False
         self.check_input()
         self.sc.fill(Watcher.white)
 
-        tl = self.game.pl.rec.getPos()
+        tl = self.game.pl.rec.get_pos()
         self.sc.blit(self.player_im, tl)
         for e in self.game.enemies:
-            tl = e.rec.getPos()
+            tl = e.rec.get_pos()
             self.sc.blit(self.enemy_im, tl)
 
-        self.drawMap()
+        self.draw_map()
 
         self.lbl_iter_num = self.myfont.render(
             "Iter number: " + str(self.game.iter_num), 1, Watcher.black
@@ -87,18 +87,18 @@ class Watcher:
         if self.clock_flag:
             self.clock.tick(self.tick_freq)
 
-    def drawMap(self):
+    def draw_map(self):
         for line in self.game.map.lines:
             w = line.br.x - line.tl.x
             h = line.br.y - line.tl.y
-            pygame.draw.rect(self.sc, Watcher.black, [line.tl.x, line.tl.y, w, h])
+            pygame.draw.Rect(self.sc, Watcher.black, [line.tl.x, line.tl.y, w, h])
 
-        self.drawFinish()
+        self.draw_finish()
 
-    def drawFinish(self,):
+    def draw_finish(self,):
         w = self.game.map.finish.br.x - self.game.map.finish.tl.x
         h = self.game.map.finish.br.y - self.game.map.finish.tl.y
-        pygame.draw.rect(
+        pygame.draw.Rect(
             self.sc,
             (0, 255, 0),
             [self.game.map.finish.tl.x, self.game.map.finish.tl.y, w, h],
@@ -136,7 +136,7 @@ class Watcher:
                 for e in state[i][1]:
                     self.sc.blit(self.enemy_im, e)
 
-            self.drawMap()
+            self.draw_map()
 
             self.sc.blit(self.lbl_iter_num, (20, 100))
             self.sc.blit(self.lbl_max_moves, (20, 130))

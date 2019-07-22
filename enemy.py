@@ -1,4 +1,4 @@
-from rectangle import rect
+from rectangle import Rect
 
 
 class EnemyCircle:
@@ -11,12 +11,12 @@ class EnemyCircle:
         self.game = game
         self.speed = speed
 
-        self.rec = rect((0, 0), (14, 14))
+        self.rec = Rect((0, 0), (14, 14))
 
     def move(self):
         # Collision with player
-        if self.rec.collidesWith(self.game.pl.rec) and self.game.colision:
-            self.game.gameContinues = False
+        if self.rec.collides_with(self.game.pl.rec) and self.game.colision:
+            self.game.game_continues = False
             self.game.learn.q_value_table[self.game.pl.rec.tl.x][
                 self.game.pl.rec.tl.y
             ].update_after_death()
